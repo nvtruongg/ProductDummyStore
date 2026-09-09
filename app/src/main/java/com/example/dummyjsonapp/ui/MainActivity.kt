@@ -6,11 +6,8 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.dummyjsonapp.R
+import androidx.recyclerview.widget.GridLayoutManager
 import com.example.dummyjsonapp.databinding.ActivityMainBinding
 import com.google.gson.Gson
 
@@ -37,7 +34,7 @@ class MainActivity : AppCompatActivity() {
 
             startActivity(intent)
         }
-        binding.recyclerView.layoutManager = LinearLayoutManager(this)
+        binding.recyclerView.layoutManager = GridLayoutManager(this, 2)
         binding.recyclerView.adapter = adapter
 
         // 3. Khởi tạo ViewModel
