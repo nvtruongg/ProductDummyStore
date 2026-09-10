@@ -70,6 +70,10 @@ class DetailActivity : AppCompatActivity() {
                 val sliderAdapter = ImageSliderAdapter(product.images)
                 binding.viewPagerImages.adapter = sliderAdapter
             }
+
+            binding.btnBack.setOnClickListener {
+                finish()
+            }
         }
     }
 }

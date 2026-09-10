@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:gravity="center"
+    android:background="#FFFFFF">
+
+    <ImageView
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:src="@android:drawable/ic_menu_manage" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Chọn Ngôn Ngữ"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="#333333" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="32dp"
+        android:text="Bạn có thể thay đổi sau trong phần Cài đặt"
+        android:textColor="#666666" />
+
+    <!-- Nút chọn Tiếng Việt -->
+    <Button
+        android:id="@+id/btnVietnamese"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="Tiếng Việt (Vietnamese)"
+        android:textSize="16sp"
+        android:backgroundTint="#EE4D2D" />
+
+    <!-- Nút chọn Tiếng Anh -->
+    <Button
+        android:id="@+id/btnEnglish"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginTop="16dp"
+        android:text="Tếng Anh (English)"
+        android:textSize="16sp"
+        android:textColor="#EE4D2D"
+        android:backgroundTint="#F5F5F5" />
+</LinearLayout>

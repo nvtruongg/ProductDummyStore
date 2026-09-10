@@ -8,6 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.dummyjsonapp.PrefManager
 import com.example.dummyjsonapp.databinding.ActivitySplashBinding
 
 class SplashActivity : AppCompatActivity() {
@@ -24,9 +25,16 @@ class SplashActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        var prefManager = PrefManager(this)
+
         Handler(Looper.getMainLooper()).postDelayed({
-            val intent = Intent(this, OnboardingActivity::class.java)
-            startActivity(intent)
+            if(prefManager.isFirstTimeLauncher){
+                startActivity(Intent(this, LanguageActivity::class.java))
+            }
+            else{
+                startActivity(Intent(this, MainActivity::class.java))
+            }
             finish()
         }, 2000)
     }
