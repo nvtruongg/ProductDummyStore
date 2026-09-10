@@ -3,8 +3,9 @@ package com.example.dummyjsonapp.repository
 import com.example.dummyjsonapp.api.ApiService
 import com.example.dummyjsonapp.db.ProductDao
 import com.example.dummyjsonapp.model.Product
+import javax.inject.Inject
 
-class ProductRepository(
+class ProductRepository @Inject constructor(
     private val apiService: ApiService,
     private val productDao : ProductDao
 ) {

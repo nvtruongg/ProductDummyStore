@@ -7,17 +7,20 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.dummyjsonapp.R
 import com.example.dummyjsonapp.databinding.ActivityMainBinding
 import com.google.gson.Gson
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    private lateinit var viewModel: ProductViewModel
     private lateinit var adapter: ProductAdapter
+    private val viewModel: ProductViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,6 +30,7 @@ class MainActivity : AppCompatActivity() {
 
         val dummyCategories = listOf("Tất cả", "Trang điểm", "Nội thất", "Nước hoa", "Thời trang", "Thực phẩm")
         val categoryAdapter = CategoryAdapter(dummyCategories)
+
         // Cài đặt lướt ngang
         binding.rvCategories.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(
             this, androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL, false
@@ -56,19 +60,18 @@ class MainActivity : AppCompatActivity() {
 
             // Đóng gói đối tượng Product thành chuỗi JSON
             val productJson = Gson().toJson(clickedProduct)
-            intent.putExtra("EXTRA_PRODUCT_JSON", productJson) // Nhét vào  Intent
-
+            intent.putExtra("EXTRA_PRODUCT_JSON", productJson)
+            // Nhét vào  Intent
             startActivity(intent)
         }
         binding.recyclerView.layoutManager = GridLayoutManager(this, 2)
         binding.recyclerView.adapter = adapter
 
-        // 3. Khởi tạo ViewModel
-        viewModel = ViewModelProvider(this)[ProductViewModel::class.java]
 
-        // 4. Lắng nghe dữ liệu (Observe LiveData)
+        // 3. Lắng nghe dữ liệu (Observe LiveData)
         observeViewModel()
 
+        //nav_bottom
         binding.bottomNavigationView.setOnItemSelectedListener { item ->
             when(item.itemId){
                 R.id.nav_home -> {

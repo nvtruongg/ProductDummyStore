@@ -1,19 +1,20 @@
 package com.example.dummyjsonapp.ui
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.dummyjsonapp.api.RetrofitClient
-import com.example.dummyjsonapp.db.AppDatabase
 import com.example.dummyjsonapp.model.Product
 import com.example.dummyjsonapp.repository.ProductRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ProductViewModel(application: Application) : AndroidViewModel(application) {
-    private val repository : ProductRepository
+@HiltViewModel
+class ProductViewModel @Inject constructor(
+    private val repository : ProductRepository) : ViewModel() {
+
     // LiveData chứa danh sách sản phẩm
     private val _products = MutableLiveData<List<Product>>()
     val products: LiveData<List<Product>> = _products
@@ -27,9 +28,6 @@ class ProductViewModel(application: Application) : AndroidViewModel(application)
     val errorMessage: LiveData<String?> = _errorMessage
 
     init {
-        val productDao = AppDatabase.getDatabase(application).productDao()
-        repository = ProductRepository(RetrofitClient.apiService, productDao)
-
         loadData()
     }
 
