@@ -16,12 +16,30 @@
         android:orientation="vertical">
 
         <!-- Ảnh sản phẩm: Phóng to tràn chiều ngang, chiều cao cố định -->
-        <ImageView
-            android:id="@+id/ivThumbnail"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="160dp"
-            android:scaleType="centerCrop"
-            android:background="#F5F5F5" />
+            android:layout_height="160dp">
+
+            <ImageView
+                android:id="@+id/ivThumbnail"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:background="#F5F5F5" />
+
+            <!-- Nhãn giảm giá -->
+            <TextView
+                android:id="@+id/tvDiscount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|end"
+                android:layout_margin="8dp"
+                android:padding="4dp"
+                android:text="Giảm 20%"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:background="@drawable/bg_discount_label"/>
+        </FrameLayout>
 
         <LinearLayout
             android:layout_width="match_parent"

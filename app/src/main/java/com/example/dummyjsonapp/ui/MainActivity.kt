@@ -9,18 +9,27 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.dummyjsonapp.R
 import com.example.dummyjsonapp.databinding.ActivityMainBinding
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var adapter: ProductAdapter
     private val viewModel: ProductViewModel by viewModels()
+    private var searchJob : Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,32 +37,51 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val dummyCategories = listOf("Tất cả", "Trang điểm", "Nội thất", "Nước hoa", "Thời trang", "Thực phẩm")
-        val categoryAdapter = CategoryAdapter(dummyCategories)
+        // Lấy controller để điều khiển system bars
+        val insetsController = WindowInsetsControllerCompat(window, window.decorView)
+        // Ẩn navigation bar
+        insetsController.hide(WindowInsetsCompat.Type.navigationBars())
+        // Tuỳ chọn: cho phép người dùng vuốt để hiện lại
+        insetsController.systemBarsBehavior =
+            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 
-        // Cài đặt lướt ngang
+        //2. Categories
+        val categoryAdapter = CategoryAdapter(emptyList()){ clickedCategory ->
+            // Khi bấm vào 1 danh mục -> Gọi ViewModel lọc danh sách
+            viewModel.filterByCategory(clickedCategory.slug)
+        }
+
+        //2.1 Cài đặt lướt ngang
         binding.rvCategories.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(
             this, androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL, false
         )
         binding.rvCategories.adapter = categoryAdapter
 
-        //sự kiện ô tìm kiếm
-        binding.edtSearch.setOnEditorActionListener { v, actionId, event ->
-            val keyword = binding.edtSearch.text.toString()
-            if(keyword.isNotEmpty()){
-                android.widget.Toast.makeText(this, "Đang tìm kiếm $keyword", android.widget.Toast.LENGTH_SHORT).show()
-                //gắn api tim kiếm json
+        //3. sự kiện ô tìm kiếm
+        binding.edtSearch.addTextChangedListener{
+            searchJob?.cancel()
+            searchJob = lifecycleScope.launch{
+                delay(500)
+                var keyword = binding.edtSearch.text.toString().trim()
+                if(keyword.isNotEmpty()){
+                    viewModel.searchProducts(keyword)
+                } else{
+                    viewModel.loadData()
+                }
             }
+        }
+        binding.edtSearch.setOnEditorActionListener { v, actionId, event ->
             // ẩn bàn phím khi nhập xong
             if(actionId == EditorInfo.IME_ACTION_SEARCH){
                 val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
                 imm.hideSoftInputFromWindow(binding.edtSearch.windowToken, 0)
                 return@setOnEditorActionListener true
             }
+            binding.edtSearch.clearFocus() // Bỏ nháy nháy ở ô search
             false
         }
 
-        // 2. Cài đặt RecyclerView
+        //4. Cài đặt RecyclerView
         adapter = ProductAdapter{ clickedProduct ->
             // phần này sẽ chạy khi có 1 item bị bấm vào
             val intent = Intent(this, DetailActivity::class.java)
@@ -68,7 +96,7 @@ class MainActivity : AppCompatActivity() {
         binding.recyclerView.adapter = adapter
 
 
-        // 3. Lắng nghe dữ liệu (Observe LiveData)
+        // 5. Lắng nghe dữ liệu (Observe LiveData)
         observeViewModel()
 
         //nav_bottom
@@ -95,6 +123,22 @@ class MainActivity : AppCompatActivity() {
             if (productList != null) {
                 // đẩy danh sách mới vào Adapter (Tự động DiffUtil xử lý)
                 adapter.submitList(productList)
+                if (productList.isEmpty()) {
+                    // Nếu rỗng: Ẩn danh sách, Hiện thông báo
+                    binding.recyclerView.visibility = View.GONE
+                    binding.tvEmptyMessage.visibility = View.VISIBLE
+                } else {
+                    // Nếu có dữ liệu: Hiện danh sách, Ẩn thông báo
+                    binding.recyclerView.visibility = View.VISIBLE
+                    binding.tvEmptyMessage.visibility = View.GONE
+                }
+            }
+        }
+        // Lắng nghe danh sách Danh mục từ API
+        viewModel.categories.observe(this) { categoryList ->
+            if (categoryList != null) {
+                // Bơm dữ liệu mới vào Adapter
+                (binding.rvCategories.adapter as? CategoryAdapter)?.updateData(categoryList)
             }
         }
 

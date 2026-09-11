@@ -30,7 +30,7 @@ class DetailActivity : AppCompatActivity() {
             // chuyển Json thành product
             val product = Gson().fromJson(productJson, Product::class.java)
 
-            //đổ dữ liệu cơ bản
+            // đổ dữ liệu cơ bản
             binding.tvDetailTitle.text = "${product.brand ?: ""} ${product.title}".trim()
             val originalPrice = product.price / (1-product.discountPercentage/100)
             binding.tvDetailPrice.text = "$${product.price} (Giảm ${product.discountPercentage}%)"

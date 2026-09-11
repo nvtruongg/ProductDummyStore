@@ -1,32 +1,56 @@
 package com.example.dummyjsonapp.ui
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.dummyjsonapp.R
+import com.example.dummyjsonapp.databinding.ItemCategoryBinding
+import com.example.dummyjsonapp.model.Category
 
-class CategoryAdapter(private val categories: List<String>) :
-    RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder>() {
+class CategoryAdapter(
+    private var categories: List<Category>,
+    private val onCategoryClick: (Category) -> Unit
+) : RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder>() {
 
-    class CategoryViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val tvName: TextView = view.findViewById(R.id.tvCategoryName)
+    private var selectedPosition = 0
+    class CategoryViewHolder(val binding: ItemCategoryBinding) :
+        RecyclerView.ViewHolder(binding.root)
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
+        val binding = ItemCategoryBinding.inflate(
+            LayoutInflater.from(parent.context), parent, false
+        )
+        return CategoryViewHolder(binding)
     }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
-            val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.item_category, parent, false)
-            return CategoryViewHolder(view)
-        }
-        override fun onBindViewHolder(holder: CategoryViewHolder, position: Int) {
-            holder.tvName.text = categories[position]
+    override fun onBindViewHolder(holder: CategoryViewHolder, position: Int) {
+        val category = categories[position]
+        holder.binding.tvCategoryName.text = category.name
 
-            // Thêm hiệu ứng nhạt đi khi bấm vào để UX tốt hơn
-            holder.itemView.setOnClickListener {
-                // Tạm thời để trống logic chọn danh mục
-            }
+        if (position == selectedPosition) {
+            holder.binding.tvCategoryName.setBackgroundColor(android.graphics.Color.YELLOW)
+            holder.binding.tvCategoryName.setTextColor(android.graphics.Color.RED)
+            holder.binding.tvCategoryName.setTypeface(null, android.graphics.Typeface.BOLD) // In đậm nếu muốn
+        } else {
+            holder.binding.tvCategoryName.setBackgroundColor(android.graphics.Color.TRANSPARENT)
+            holder.binding.tvCategoryName.setTextColor(android.graphics.Color.DKGRAY)
+            holder.binding.tvCategoryName.setTypeface(null, android.graphics.Typeface.NORMAL)
         }
 
-        override fun getItemCount(): Int = categories.size
+        holder.itemView.setOnClickListener {
+            val oldPosition = selectedPosition
+            selectedPosition = holder.adapterPosition
+            notifyItemChanged(oldPosition)
+            notifyItemChanged(selectedPosition)
+
+            onCategoryClick(category)
+        }
+    }
+
+    // hàm này để MainActivity có thể bơm dữ liệu mới vào
+    fun updateData(newCategories: List<Category>) {
+        this.categories = newCategories
+        notifyDataSetChanged() // Báo cho RecyclerView vẽ lại giao diện
+    }
+
+    override fun getItemCount(): Int = categories.size
 }

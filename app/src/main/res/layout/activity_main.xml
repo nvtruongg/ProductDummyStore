@@ -23,11 +23,11 @@
             <EditText
                 android:id="@+id/edtSearch"
                 android:layout_width="0dp"
-                android:layout_height="40dp"
+                android:layout_height="48dp"
                 android:layout_weight="1"
                 android:background="@android:color/white"
                 android:hint="Tìm kiếm sản phẩm..."
-                android:imeOptions="actionSearch"
+                android:imeOptions="actionDone"
                 android:paddingHorizontal="12dp"
                 android:textSize="14sp"
                 android:textColor="@color/black"
@@ -66,6 +66,17 @@
                 android:layout_height="match_parent"
                 android:padding="8dp"
                 android:clipToPadding="false"/>
+
+            <TextView
+                android:id="@+id/tvEmptyMessage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Không tìm thấy sản phẩm nào!"
+                android:textSize="16sp"
+                android:textColor="@android:color/darker_gray"
+                android:visibility="gone" />
 
             <ProgressBar
                 android:id="@+id/progressBar"
