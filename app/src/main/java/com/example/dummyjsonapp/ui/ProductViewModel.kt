@@ -57,6 +57,16 @@ class ProductViewModel @Inject constructor(
             _isLoading.postValue(false)
         }
     }
+    //live data dành cho detail
+    private val _selectedProduct = MutableLiveData<Product?>()
+    val selectedProduct: LiveData<Product?> = _selectedProduct
+
+    fun loadProductDetail(productId: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val product = repository.getProductById(productId)
+            _selectedProduct.postValue(product)
+        }
+    }
     fun loadCategories() {
         viewModelScope.launch(Dispatchers.IO) {
             val result = repository.getCategoriesFromApi()

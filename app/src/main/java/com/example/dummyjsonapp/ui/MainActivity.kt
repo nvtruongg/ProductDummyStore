@@ -77,7 +77,7 @@ class MainActivity : AppCompatActivity() {
                 imm.hideSoftInputFromWindow(binding.edtSearch.windowToken, 0)
                 return@setOnEditorActionListener true
             }
-            binding.edtSearch.clearFocus() // Bỏ nháy nháy ở ô search
+            binding.edtSearch.clearFocus() // Bỏ focus ở ô search
             false
         }
 
@@ -85,10 +85,7 @@ class MainActivity : AppCompatActivity() {
         adapter = ProductAdapter{ clickedProduct ->
             // phần này sẽ chạy khi có 1 item bị bấm vào
             val intent = Intent(this, DetailActivity::class.java)
-
-            // Đóng gói đối tượng Product thành chuỗi JSON
-            val productJson = Gson().toJson(clickedProduct)
-            intent.putExtra("EXTRA_PRODUCT_JSON", productJson)
+            intent.putExtra("product_id", clickedProduct.id)
             // Nhét vào  Intent
             startActivity(intent)
         }

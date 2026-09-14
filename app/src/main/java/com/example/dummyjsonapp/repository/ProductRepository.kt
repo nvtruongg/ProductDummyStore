@@ -29,6 +29,9 @@ class ProductRepository @Inject constructor(
             Result.failure(e)
         }
     }
+    suspend fun getProductById(id: Int): Product? {
+        return productDao.getProductById(id)
+    }
     // Nối với API Tìm kiếm
     suspend fun searchProductsFromApi(keyword: String): Result<List<Product>> {
         return try {
@@ -36,10 +39,17 @@ class ProductRepository @Inject constructor(
             if (response.isSuccessful && response.body() != null) {
                 Result.success(response.body()!!.products)
             } else {
-                Result.failure(Exception("Lỗi API: ${response.code()}"))
+                val localData = productDao.searchProducts(keyword)
+                if (localData.isNotEmpty()) Result.success(localData)
+                else Result.failure(Exception("Không tìm thấy kết quả!"))
             }
         } catch (e: Exception) {
-            Result.failure(e)
+            val localData = productDao.searchProducts(keyword)
+            if (localData.isNotEmpty()) {
+                Result.success(localData)
+            } else {
+                Result.failure(Exception("Bạn đang offline!"))
+            }
         }
     }
     // Nối với API Danh mục
@@ -63,10 +73,17 @@ class ProductRepository @Inject constructor(
             if (response.isSuccessful && response.body() != null) {
                 Result.success(response.body()!!.products)
             } else {
-                Result.failure(Exception("Lỗi lọc danh mục: ${response.code()}"))
+                val localData = productDao.getProductsByCategory(categorySlug)
+                if (localData.isNotEmpty()) Result.success(localData)
+                else Result.failure(Exception("Lỗi máy chủ và không có dữ liệu cũ!"))
             }
         } catch (e: Exception) {
-            Result.failure(e)
+            val localData = productDao.getProductsByCategory(categorySlug)
+            if (localData.isNotEmpty()) {
+                Result.success(localData)
+            } else {
+                Result.failure(Exception("Bạn đang offline!"))
+            }
         }
     }
 }
