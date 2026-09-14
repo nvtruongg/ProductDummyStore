@@ -41,7 +41,8 @@ object AppModule {
             context,
             AppDatabase::class.java,
             "dummy_store_db"
-        ).build()
+        ).fallbackToDestructiveMigration()
+            .build()
     }
     @Provides
     @Singleton

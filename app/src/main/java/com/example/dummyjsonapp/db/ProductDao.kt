@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.example.dummyjsonapp.model.FavoriteEntity
 import com.example.dummyjsonapp.model.Product
 
 @Dao
@@ -25,4 +26,15 @@ interface ProductDao {
 
     @Query("DELETE FROM products")
     suspend fun clearAllProducts()
+
+    // --- CÁC HÀM CHO FAVORITES ---
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertFavorite(favorite: FavoriteEntity)
+
+    @Query("DELETE FROM favorites WHERE productId = :productId")
+    suspend fun removeFavorite(productId: Int)
+
+    @Query("SELECT productId FROM favorites")
+    suspend fun getAllFavoriteIds(): List<Int>
 }
