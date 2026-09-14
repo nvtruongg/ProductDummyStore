@@ -5,11 +5,12 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.example.dummyjsonapp.model.CartEntity
 import com.example.dummyjsonapp.model.Converters
 import com.example.dummyjsonapp.model.FavoriteEntity
 import com.example.dummyjsonapp.model.Product
 
-@Database(entities = [Product::class, FavoriteEntity::class], version = 3, exportSchema = false)
+@Database(entities = [Product::class, FavoriteEntity::class, CartEntity::class], version = 4, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun productDao() : ProductDao

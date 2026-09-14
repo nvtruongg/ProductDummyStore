@@ -4,6 +4,8 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.example.dummyjsonapp.model.CartEntity
+import com.example.dummyjsonapp.model.CartItem
 import com.example.dummyjsonapp.model.FavoriteEntity
 import com.example.dummyjsonapp.model.Product
 
@@ -40,4 +42,22 @@ interface ProductDao {
 
     @Query("SELECT products.* FROM products INNER JOIN favorites ON products.id = favorites.productId")
     suspend fun getFavoritedProducts(): List<Product>
+
+    // --- CÁC HÀM CHO GIỎ HÀNG (CART) ---
+
+    // Thêm hoặc cập nhật sản phẩm trong giỏ
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertOrUpdateCart(cartItem: CartEntity)
+
+    // Xóa một sản phẩm khỏi giỏ
+    @Query("DELETE FROM cart WHERE productId = :productId")
+    suspend fun removeFromCart(productId: Int)
+
+    // Lấy danh sách hiển thị Giỏ hàng (Gộp Product và Số lượng)
+    @Query("SELECT products.*, cart.quantity FROM products INNER JOIN cart ON products.id = cart.productId")
+    suspend fun getCartItems(): List<CartItem>
+
+    // (Tùy chọn) Xóa toàn bộ giỏ hàng sau khi thanh toán xong
+    @Query("DELETE FROM cart")
+    suspend fun clearCart()
 }
