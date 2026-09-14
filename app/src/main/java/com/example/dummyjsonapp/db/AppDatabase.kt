@@ -9,7 +9,7 @@ import com.example.dummyjsonapp.model.Converters
 import com.example.dummyjsonapp.model.FavoriteEntity
 import com.example.dummyjsonapp.model.Product
 
-@Database(entities = [Product::class, FavoriteEntity::class], version = 2, exportSchema = false)
+@Database(entities = [Product::class, FavoriteEntity::class], version = 3, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun productDao() : ProductDao

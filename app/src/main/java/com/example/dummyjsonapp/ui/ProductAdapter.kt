@@ -7,13 +7,20 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.dummyjsonapp.R
 import com.example.dummyjsonapp.databinding.ItemProductBinding
 import com.example.dummyjsonapp.model.Product
 import kotlin.math.roundToInt
 
-class ProductAdapter(private val onItemClick: (Product) -> Unit) :
+class ProductAdapter(private val onItemClick: (Product) -> Unit,
+    private val onFavoriteClick: (Product, Boolean) -> Unit) :
     ListAdapter<Product, ProductAdapter.ProductViewHolder>(ProductDiffCallback()) {
 
+    private var favoriteProductIds: Set<Int> = emptySet()
+    fun updateFavorites(newFavorites: Set<Int>) {
+        favoriteProductIds = newFavorites
+        notifyDataSetChanged() // Cập nhật lại UI khi có thay đổi tim
+    }
     // Tạo ViewHolder bằng ViewBinding
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
         val binding = ItemProductBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -51,6 +58,23 @@ class ProductAdapter(private val onItemClick: (Product) -> Unit) :
             binding.root.setOnClickListener {
                 onItemClick(product) // Bắn dữ liệu sản phẩm đó ra ngoài
             }
+
+            val isFavorited = favoriteProductIds.contains(product.id)
+            // Đổi icon tương ứng
+            if (isFavorited) {
+                binding.ivFavorite.setImageResource(R.drawable.ic_favorite_filled)
+            } else {
+                binding.ivFavorite.setImageResource(R.drawable.heart)
+            }
+
+            // Bắt sự kiện click vào trái tim
+            binding.ivFavorite.setOnClickListener {
+                // Đảo ngược trạng thái hiện tại và báo ra ngoài cho ViewModel xử lý
+                onFavoriteClick(product, !isFavorited)
+            }
+
+            // (Giữ nguyên sự kiện click vào toàn bộ item để vào trang Detail)
+            binding.root.setOnClickListener { onItemClick(product) }
         }
     }
 

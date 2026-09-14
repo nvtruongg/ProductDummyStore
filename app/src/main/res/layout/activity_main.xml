@@ -6,94 +6,19 @@
     android:orientation="vertical"
     android:background="#F5F5F5">
 
-    <LinearLayout
+    <FrameLayout
+        android:id="@+id/fragmentContainer"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="vertical">
-        <!-- Khu vực 1: Thanh Tìm kiếm (Search) & Nút Lọc/Sắp xếp (Sort/Limit) -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="16dp"
-            android:background="#EE4D2D"
-            android:gravity="center_vertical">
-
-            <EditText
-                android:id="@+id/edtSearch"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:background="@android:color/white"
-                android:hint="Tìm kiếm sản phẩm..."
-                android:imeOptions="actionDone"
-                android:paddingHorizontal="12dp"
-                android:textSize="14sp"
-                android:textColor="@color/black"
-                android:maxLines="1"
-                android:inputType="text"/>
-
-            <ImageView
-                android:id="@+id/btnFilterSort"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="8dp"
-                android:src="@drawable/filter"
-                app:tint="#FFFFFF"
-                android:padding="8dp"/>
-        </LinearLayout>
-
-        <!-- Khu vực 2: Danh sách Danh mục (Categories) -->
-        <!-- Sẽ dùng một RecyclerView lướt ngang -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvCategories"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="8dp"
-            android:background="#FFFFFF"
-            android:clipToPadding="false"/>
-
-        <!-- Khu vực 3: Danh sách Sản phẩm dạng Lưới (Grid) -->
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="8dp"
-                android:clipToPadding="false"/>
-
-            <TextView
-                android:id="@+id/tvEmptyMessage"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="Không tìm thấy sản phẩm nào!"
-                android:textSize="16sp"
-                android:textColor="@android:color/darker_gray"
-                android:visibility="gone" />
-
-            <ProgressBar
-                android:id="@+id/progressBar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:visibility="gone"/>
-        </FrameLayout>
-    </LinearLayout>
+        android:layout_weight="1"/>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
-        app:menu="@menu/bottom_nav_menu"
+        app:elevation="8dp"
         app:itemIconTint="#EE4D2D"
         app:itemTextColor="#EE4D2D"
-        app:elevation="8dp" />
+        app:menu="@menu/bottom_nav_menu" />
 </LinearLayout>

@@ -5,6 +5,10 @@
         android:icon="@drawable/home_page"
         android:title="Trang chủ" />
     <item
+        android:id="@+id/nav_favorite"
+        android:icon="@drawable/heart"
+        android:title="Yêu thích" />
+    <item
         android:id="@+id/nav_cart"
         android:icon="@drawable/basket"
         android:title="Giỏ hàng" />

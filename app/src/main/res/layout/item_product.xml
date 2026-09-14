@@ -26,6 +26,17 @@
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
                 android:background="#F5F5F5" />
+            <ImageView
+                android:id="@+id/ivFavorite"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_margin="8dp"
+                android:padding="6dp"
+                android:background="?selectableItemBackgroundBorderless"
+                android:src="@drawable/heart"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:contentDescription="Nút yêu thích"/>
 
             <!-- Nhãn giảm giá -->
             <TextView

@@ -37,4 +37,7 @@ interface ProductDao {
 
     @Query("SELECT productId FROM favorites")
     suspend fun getAllFavoriteIds(): List<Int>
+
+    @Query("SELECT products.* FROM products INNER JOIN favorites ON products.id = favorites.productId")
+    suspend fun getFavoritedProducts(): List<Product>
 }

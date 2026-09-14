@@ -30,9 +30,16 @@ class ProductViewModel @Inject constructor(
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> = _errorMessage
 
+    private val _favoriteIds = MutableLiveData<Set<Int>>(emptySet())
+    val favoriteIds: LiveData<Set<Int>> = _favoriteIds
+
+    private val _favoritedProductsList = MutableLiveData<List<Product>>()
+    val favoritedProductsList: LiveData<List<Product>> = _favoritedProductsList
+
     init {
         loadData()
         loadCategories()
+        loadFavorites()
     }
     fun loadData() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -120,6 +127,31 @@ class ProductViewModel @Inject constructor(
             }
 
             _isLoading.postValue(false)
+        }
+    }
+    // Tải danh sách tim từ Database lên
+    fun loadFavorites() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val ids = repository.getAllFavoriteIds().toSet()
+            _favoriteIds.postValue(ids)
+        }
+    }
+
+    // Xử lý khi người dùng bấm thả/hủy tim
+    fun toggleFavorite(productId: Int, isFavorite: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.toggleFavorite(productId, isFavorite)
+            loadFavorites() // Cập nhật lại danh sách ngay lập tức
+            loadFavoritedProductsList()
+        }
+    }
+
+    fun loadFavoritedProductsList() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val result = repository.getFavoritedProducts()
+            if (result.isSuccess) {
+                _favoritedProductsList.postValue(result.getOrDefault(emptyList()))
+            }
         }
     }
 }

@@ -3,6 +3,7 @@ package com.example.dummyjsonapp.repository
 import com.example.dummyjsonapp.api.ApiService
 import com.example.dummyjsonapp.db.ProductDao
 import com.example.dummyjsonapp.model.Category
+import com.example.dummyjsonapp.model.FavoriteEntity
 import com.example.dummyjsonapp.model.Product
 import javax.inject.Inject
 
@@ -84,6 +85,25 @@ class ProductRepository @Inject constructor(
             } else {
                 Result.failure(Exception("Bạn đang offline!"))
             }
+        }
+    }
+    suspend fun toggleFavorite(productId: Int, isFavorite: Boolean) {
+        if (isFavorite) {
+            productDao.insertFavorite(FavoriteEntity(productId))
+        } else {
+            productDao.removeFavorite(productId)
+        }
+    }
+
+    suspend fun getAllFavoriteIds(): List<Int> {
+        return productDao.getAllFavoriteIds()
+    }
+    suspend fun getFavoritedProducts(): Result<List<Product>> {
+        return try {
+            val favorites = productDao.getFavoritedProducts()
+            Result.success(favorites)
+        } catch (e: Exception) {
+            Result.failure(Exception("Không thể tải danh sách yêu thích!"))
         }
     }
 }
