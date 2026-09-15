@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.dummyjsonapp.model.CartItem
 import com.example.dummyjsonapp.model.Category
 import com.example.dummyjsonapp.model.Product
 import com.example.dummyjsonapp.repository.ProductRepository
@@ -35,6 +36,13 @@ class ProductViewModel @Inject constructor(
 
     private val _favoritedProductsList = MutableLiveData<List<Product>>()
     val favoritedProductsList: LiveData<List<Product>> = _favoritedProductsList
+
+    //livedate cho Cart
+    private val _cartItems = MutableLiveData<List<CartItem>>()
+    val cartItems: LiveData<List<CartItem>> = _cartItems
+
+    private val _totalPrice = MutableLiveData<Double>()
+    val totalPrice: LiveData<Double> = _totalPrice
 
     init {
         loadData()
@@ -152,6 +160,51 @@ class ProductViewModel @Inject constructor(
             if (result.isSuccess) {
                 _favoritedProductsList.postValue(result.getOrDefault(emptyList()))
             }
+        }
+    }
+
+    fun addToCart(productId: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val success = repository.addToCart(productId)
+            if (success) {
+                _errorMessage.postValue("Đã thêm vào giỏ hàng!")
+            } else {
+                _errorMessage.postValue("Số lượng vượt quá tồn kho!")
+            }
+        }
+    }
+    fun loadCart() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val items = repository.getCartItems()
+            _cartItems.postValue(items)
+
+            // Tính tổng tiền: Giá * Số lượng
+            val total = items.sumOf { it.product.price * it.quantity }
+            _totalPrice.postValue(total)
+        }
+    }
+
+    fun updateCartQuantity(productId: Int, newQuantity: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val success = repository.updateCartQuantity(productId, newQuantity)
+            if (!success) {
+                _errorMessage.postValue("Số lượng vượt quá tồn kho!")
+            }
+            loadCart()
+        }
+    }
+
+    fun removeCartItem(productId: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.removeFromCart(productId)
+            loadCart() // Tải lại giỏ hàng sau khi xóa
+        }
+    }
+    fun placeOrder() {
+        viewModelScope.launch(Dispatchers.IO) {
+            //TODO: phát triển bảng OrderEntity,insert thông tin đơn hàng vào đây
+            repository.clearCart()
+            loadCart()
         }
     }
 }

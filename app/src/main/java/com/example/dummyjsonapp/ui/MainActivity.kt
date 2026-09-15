@@ -50,7 +50,9 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.nav_cart -> {
-                    Toast.makeText(this, "Giỏ hàng đang phát triển", Toast.LENGTH_SHORT).show()
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.fragmentContainer, CartFragment())
+                        .commit()
                     true
                 }
                 R.id.nav_profile -> {

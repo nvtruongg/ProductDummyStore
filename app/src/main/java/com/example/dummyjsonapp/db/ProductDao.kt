@@ -60,4 +60,7 @@ interface ProductDao {
     // (Tùy chọn) Xóa toàn bộ giỏ hàng sau khi thanh toán xong
     @Query("DELETE FROM cart")
     suspend fun clearCart()
+
+    @Query("SELECT * FROM cart WHERE productId = :productId")
+    suspend fun getCartItemById(productId: Int): CartEntity?
 }

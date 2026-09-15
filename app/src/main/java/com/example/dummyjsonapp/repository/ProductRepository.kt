@@ -2,6 +2,8 @@ package com.example.dummyjsonapp.repository
 
 import com.example.dummyjsonapp.api.ApiService
 import com.example.dummyjsonapp.db.ProductDao
+import com.example.dummyjsonapp.model.CartEntity
+import com.example.dummyjsonapp.model.CartItem
 import com.example.dummyjsonapp.model.Category
 import com.example.dummyjsonapp.model.FavoriteEntity
 import com.example.dummyjsonapp.model.Product
@@ -105,5 +107,49 @@ class ProductRepository @Inject constructor(
         } catch (e: Exception) {
             Result.failure(Exception("Không thể tải danh sách yêu thích!"))
         }
+    }
+
+    suspend fun addToCart(productId: Int) : Boolean {
+        val product = productDao.getProductById(productId) ?: return false
+        val existingItem = productDao.getCartItemById(productId)
+
+        val currentQuantity = existingItem?.quantity ?: 0
+        if(currentQuantity + 1> product.stock){
+            return false
+        }
+        if (existingItem != null) {
+            existingItem.quantity += 1
+            productDao.insertOrUpdateCart(existingItem)
+        } else {
+            productDao.insertOrUpdateCart(CartEntity(productId, 1))
+        }
+        return true
+    }
+
+    suspend fun getCartItems(): List<CartItem> {
+        return productDao.getCartItems()
+    }
+
+    suspend fun updateCartQuantity(productId: Int, quantity: Int): Boolean {
+        val product = productDao.getProductById(productId) ?: return false
+        if(quantity > product.stock) return false
+        if (quantity > 0) {
+            val item = productDao.getCartItemById(productId)
+            if (item != null) {
+                item.quantity = quantity
+                productDao.insertOrUpdateCart(item)
+            }
+        } else {
+            // Nếu số lượng tụt xuống 0 thì xóa luôn khỏi giỏ
+            productDao.removeFromCart(productId)
+        }
+        return true
+    }
+
+    suspend fun removeFromCart(productId: Int) {
+        productDao.removeFromCart(productId)
+    }
+    suspend fun clearCart() {
+        productDao.clearCart()
     }
 }

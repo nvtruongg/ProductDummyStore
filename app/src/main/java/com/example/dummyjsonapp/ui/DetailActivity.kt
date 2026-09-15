@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.StrikethroughSpan
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -87,6 +88,30 @@ class DetailActivity : AppCompatActivity() {
                 binding.btnBack.setOnClickListener {
                     finish()
                 }
+            }
+        }
+        binding.btnAddCart.setOnClickListener {
+            if (product_id != -1) {
+                viewModel.addToCart(product_id)
+                Toast.makeText(this, "Đã thêm vào giỏ hàng!", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        binding.btnBuyNow.setOnClickListener {
+            if (product_id != -1) {
+                viewModel.addToCart(product_id)
+                Toast.makeText(this, "Chuyển đến giỏ hàng...", Toast.LENGTH_SHORT).show()
+                // TODO: Mở màn hình Giỏ hàng hoặc Thanh toán sau
+                finish() // Tạm thời đóng màn detail lại
+            }
+        }
+        oserveViewModel()
+    }
+
+    private fun oserveViewModel() {
+        viewModel.errorMessage.observe(this) { message ->
+            if (message != null) {
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show()
             }
         }
     }

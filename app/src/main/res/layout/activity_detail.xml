@@ -16,8 +16,11 @@
 
         <ImageView
             android:id="@+id/btnBack"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="60dp"
+            android:layout_height="30dp"
+            android:paddingBottom="4dp"
+            android:paddingTop="4dp"
+            android:paddingEnd="30dp"
             android:src="@drawable/left_arrow"
             app:tint="#333333"
             android:background="?attr/selectableItemBackgroundBorderless"
@@ -27,7 +30,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="0dp"
             android:text="Chi tiết sản phẩm"
             android:textSize="18sp"
             android:textColor="#333333"
