@@ -1,10 +1,10 @@
-package com.example.dummyjsonapp.di
+package com.example.dummyjsonapp.core.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.dummyjsonapp.core.network.ApiService
 import com.example.dummyjsonapp.core.database.AppDatabase
 import com.example.dummyjsonapp.core.database.ProductDao
+import com.example.dummyjsonapp.core.network.ApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
