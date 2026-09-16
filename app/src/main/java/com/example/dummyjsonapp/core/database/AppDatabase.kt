@@ -1,4 +1,4 @@
-package com.example.dummyjsonapp.db
+package com.example.dummyjsonapp.core.database
 
 import android.content.Context
 import androidx.room.Database

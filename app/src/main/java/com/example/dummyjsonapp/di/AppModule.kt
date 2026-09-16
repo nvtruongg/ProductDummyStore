@@ -3,8 +3,8 @@ package com.example.dummyjsonapp.di
 import android.content.Context
 import androidx.room.Room
 import com.example.dummyjsonapp.core.network.ApiService
-import com.example.dummyjsonapp.db.AppDatabase
-import com.example.dummyjsonapp.db.ProductDao
+import com.example.dummyjsonapp.core.database.AppDatabase
+import com.example.dummyjsonapp.core.database.ProductDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

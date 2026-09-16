@@ -1,7 +1,7 @@
 package com.example.dummyjsonapp.repository
 
 import com.example.dummyjsonapp.core.network.ApiService
-import com.example.dummyjsonapp.db.ProductDao
+import com.example.dummyjsonapp.core.database.ProductDao
 import com.example.dummyjsonapp.model.CartEntity
 import com.example.dummyjsonapp.model.CartItem
 import com.example.dummyjsonapp.model.Category
