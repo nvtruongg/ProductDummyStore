@@ -1,4 +1,4 @@
-package com.example.dummyjsonapp.api
+package com.example.dummyjsonapp.core.network
 
 import com.example.dummyjsonapp.model.Category
 import com.example.dummyjsonapp.model.ProductResponse
