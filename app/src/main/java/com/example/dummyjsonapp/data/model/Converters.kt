@@ -1,4 +1,4 @@
-package com.example.dummyjsonapp.model
+package com.example.dummyjsonapp.data.model
 
 import androidx.room.TypeConverter
 import com.google.gson.Gson
@@ -12,7 +12,7 @@ class Converters {
 
     @TypeConverter
     fun toStringList(value: String): List<String> {
-        val listType = object : TypeToken<List<String>>() {}.type
+        val listType = object : com.google.gson.reflect.TypeToken<List<String>>() {}.type
         return Gson().fromJson(value, listType) // Json -> List
     }
 
@@ -35,7 +35,7 @@ class Converters {
     @TypeConverter
     fun toReviewList(value: String?): List<Review>? {
         if (value.isNullOrEmpty()) return null
-        val listType = object : TypeToken<List<Review>>() {}.type
+        val listType = object : com.google.gson.reflect.TypeToken<List<Review>>() {}.type
         return Gson().fromJson(value, listType)
     }
 }

@@ -1,7 +1,7 @@
 package com.example.dummyjsonapp.core.network
 
-import com.example.dummyjsonapp.model.Category
-import com.example.dummyjsonapp.model.ProductResponse
+import com.example.dummyjsonapp.data.model.Category
+import com.example.dummyjsonapp.data.model.ProductResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path

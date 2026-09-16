@@ -14,7 +14,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import com.bumptech.glide.Glide
 import com.example.dummyjsonapp.R
 import com.example.dummyjsonapp.databinding.ActivityDetailBinding
-import com.example.dummyjsonapp.model.Product
+import com.example.dummyjsonapp.data.model.Product
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 

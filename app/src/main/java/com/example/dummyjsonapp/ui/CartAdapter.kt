@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.dummyjsonapp.databinding.ItemCartBinding
-import com.example.dummyjsonapp.model.CartItem
+import com.example.dummyjsonapp.data.model.CartItem
 
 class CartAdapter (
     private val onIncreaseClick : (CartItem) -> Unit,

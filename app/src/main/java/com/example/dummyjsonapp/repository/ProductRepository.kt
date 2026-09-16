@@ -2,11 +2,11 @@ package com.example.dummyjsonapp.repository
 
 import com.example.dummyjsonapp.core.network.ApiService
 import com.example.dummyjsonapp.core.database.ProductDao
-import com.example.dummyjsonapp.model.CartEntity
-import com.example.dummyjsonapp.model.CartItem
-import com.example.dummyjsonapp.model.Category
-import com.example.dummyjsonapp.model.FavoriteEntity
-import com.example.dummyjsonapp.model.Product
+import com.example.dummyjsonapp.data.model.CartEntity
+import com.example.dummyjsonapp.data.model.CartItem
+import com.example.dummyjsonapp.data.model.Category
+import com.example.dummyjsonapp.data.model.FavoriteEntity
+import com.example.dummyjsonapp.data.model.Product
 import javax.inject.Inject
 
 class ProductRepository @Inject constructor(

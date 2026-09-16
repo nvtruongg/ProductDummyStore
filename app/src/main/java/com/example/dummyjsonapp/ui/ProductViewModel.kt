@@ -4,9 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.dummyjsonapp.model.CartItem
-import com.example.dummyjsonapp.model.Category
-import com.example.dummyjsonapp.model.Product
+import com.example.dummyjsonapp.data.model.CartItem
+import com.example.dummyjsonapp.data.model.Category
+import com.example.dummyjsonapp.data.model.Product
 import com.example.dummyjsonapp.repository.ProductRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
