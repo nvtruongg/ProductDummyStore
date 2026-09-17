@@ -1,4 +1,4 @@
-package com.example.dummyjsonapp.repository
+package com.example.dummyjsonapp.data.repository
 
 import com.example.dummyjsonapp.data.remote.ApiService
 import com.example.dummyjsonapp.data.local.dao.ProductDao

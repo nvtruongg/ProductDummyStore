@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.dummyjsonapp.data.model.CartItem
 import com.example.dummyjsonapp.data.model.Category
 import com.example.dummyjsonapp.data.model.Product
-import com.example.dummyjsonapp.repository.ProductRepository
+import com.example.dummyjsonapp.data.repository.ProductRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
