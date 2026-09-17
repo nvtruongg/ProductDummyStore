@@ -1,4 +1,4 @@
-package com.example.dummyjsonapp.ui
+package com.example.dummyjsonapp.presentation.cart
 
 import android.content.Intent
 import android.os.Bundle
@@ -10,8 +10,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dummyjsonapp.databinding.FragmentCartBinding
+import com.example.dummyjsonapp.presentation.checkout.CheckoutActivity
+import com.example.dummyjsonapp.presentation.home.ProductViewModel
+import com.example.dummyjsonapp.presentation.product.DetailActivity
 import dagger.hilt.android.AndroidEntryPoint
-
 
 @AndroidEntryPoint
 class CartFragment : Fragment() {

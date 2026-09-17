@@ -1,4 +1,4 @@
-package com.example.dummyjsonapp
+package com.example.dummyjsonapp.core.preference
 
 import android.content.Context
 

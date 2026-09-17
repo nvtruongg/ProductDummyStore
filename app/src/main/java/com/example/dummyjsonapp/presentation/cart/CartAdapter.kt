@@ -1,4 +1,4 @@
-package com.example.dummyjsonapp.ui
+package com.example.dummyjsonapp.presentation.cart
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

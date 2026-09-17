@@ -1,14 +1,13 @@
-package com.example.dummyjsonapp.ui
+package com.example.dummyjsonapp.presentation.onboarding
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import com.example.dummyjsonapp.PrefManager
+import com.example.dummyjsonapp.core.preference.PrefManager
 import com.example.dummyjsonapp.databinding.ActivityOnboardingBinding
+import com.example.dummyjsonapp.presentation.main.MainActivity
 
 class OnboardingActivity : AppCompatActivity() {
     private lateinit var binding: ActivityOnboardingBinding

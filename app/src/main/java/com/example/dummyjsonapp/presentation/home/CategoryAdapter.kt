@@ -1,10 +1,12 @@
-package com.example.dummyjsonapp.ui
+package com.example.dummyjsonapp.presentation.home
 
+import android.graphics.Color
+import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.dummyjsonapp.databinding.ItemCategoryBinding
 import com.example.dummyjsonapp.data.remote.dto.Category
+import com.example.dummyjsonapp.databinding.ItemCategoryBinding
 
 class CategoryAdapter(
     private var categories: List<Category>,
@@ -27,13 +29,13 @@ class CategoryAdapter(
         holder.binding.tvCategoryName.text = category.name
 
         if (position == selectedPosition) {
-            holder.binding.tvCategoryName.setBackgroundColor(android.graphics.Color.YELLOW)
-            holder.binding.tvCategoryName.setTextColor(android.graphics.Color.RED)
-            holder.binding.tvCategoryName.setTypeface(null, android.graphics.Typeface.BOLD) // In đậm nếu muốn
+            holder.binding.tvCategoryName.setBackgroundColor(Color.YELLOW)
+            holder.binding.tvCategoryName.setTextColor(Color.RED)
+            holder.binding.tvCategoryName.setTypeface(null, Typeface.BOLD) // In đậm nếu muốn
         } else {
-            holder.binding.tvCategoryName.setBackgroundColor(android.graphics.Color.TRANSPARENT)
-            holder.binding.tvCategoryName.setTextColor(android.graphics.Color.DKGRAY)
-            holder.binding.tvCategoryName.setTypeface(null, android.graphics.Typeface.NORMAL)
+            holder.binding.tvCategoryName.setBackgroundColor(Color.TRANSPARENT)
+            holder.binding.tvCategoryName.setTextColor(Color.DKGRAY)
+            holder.binding.tvCategoryName.setTypeface(null, Typeface.NORMAL)
         }
 
         holder.itemView.setOnClickListener {

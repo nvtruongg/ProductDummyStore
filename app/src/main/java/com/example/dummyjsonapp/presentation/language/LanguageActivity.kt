@@ -1,4 +1,4 @@
-package com.example.dummyjsonapp.ui
+package com.example.dummyjsonapp.presentation.language
 
 import android.content.Intent
 import android.os.Bundle
@@ -7,8 +7,10 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import com.example.dummyjsonapp.PrefManager
+import com.example.dummyjsonapp.core.preference.PrefManager
 import com.example.dummyjsonapp.databinding.ActivityLanguageBinding
+import com.example.dummyjsonapp.presentation.onboarding.OnboardingActivity
+import com.example.dummyjsonapp.presentation.splash.SplashActivity
 
 class LanguageActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLanguageBinding

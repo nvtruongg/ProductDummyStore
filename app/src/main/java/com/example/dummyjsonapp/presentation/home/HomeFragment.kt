@@ -1,4 +1,4 @@
-package com.example.dummyjsonapp.ui
+package com.example.dummyjsonapp.presentation.home
 
 import android.content.Context
 import android.content.Intent
@@ -16,6 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dummyjsonapp.databinding.FragmentHomeBinding
+import com.example.dummyjsonapp.presentation.product.DetailActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -42,7 +43,8 @@ class HomeFragment : Fragment() {
         val categoryAdapter = CategoryAdapter(emptyList()) { clickedCategory ->
             viewModel.filterByCategory(clickedCategory.slug)
         }
-        binding.rvCategories.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        binding.rvCategories.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         binding.rvCategories.adapter = categoryAdapter
 
         // 2. Ô tìm kiếm

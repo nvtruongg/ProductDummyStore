@@ -1,9 +1,10 @@
-package com.example.dummyjsonapp.ui
+package com.example.dummyjsonapp.presentation.checkout
 
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.dummyjsonapp.databinding.ActivityOrderSuccessBinding
+import com.example.dummyjsonapp.presentation.main.MainActivity
 
 class OrderSuccessActivity : AppCompatActivity() {
     private lateinit var binding: ActivityOrderSuccessBinding

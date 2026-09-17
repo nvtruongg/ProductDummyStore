@@ -1,4 +1,4 @@
-package com.example.dummyjsonapp.ui
+package com.example.dummyjsonapp.presentation.splash
 
 import android.content.Intent
 import android.os.Bundle
@@ -9,8 +9,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import com.example.dummyjsonapp.PrefManager
+import com.example.dummyjsonapp.core.preference.PrefManager
 import com.example.dummyjsonapp.databinding.ActivitySplashBinding
+import com.example.dummyjsonapp.presentation.main.MainActivity
+import com.example.dummyjsonapp.presentation.language.LanguageActivity
 
 class SplashActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySplashBinding

@@ -1,5 +1,6 @@
-package com.example.dummyjsonapp.ui
+package com.example.dummyjsonapp.presentation.product
 
+import android.graphics.Paint
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -7,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.example.dummyjsonapp.databinding.ActivityDetailBinding
+import com.example.dummyjsonapp.presentation.home.ProductViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -41,7 +43,7 @@ class DetailActivity : AppCompatActivity() {
                     "$${product.price} (Giảm ${product.discountPercentage}%)"
                 binding.tvOriginalPrice.text = "$${String.format("%.2f", originalPrice)}"
                 binding.tvOriginalPrice.paintFlags =
-                    binding.tvOriginalPrice.paintFlags or android.graphics.Paint.STRIKE_THRU_TEXT_FLAG
+                    binding.tvOriginalPrice.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
                 binding.tvDetailRating.text = "⭐ ${product.rating}/5 | Kho: ${product.stock}"
                 binding.tvDescription.text = product.description
 

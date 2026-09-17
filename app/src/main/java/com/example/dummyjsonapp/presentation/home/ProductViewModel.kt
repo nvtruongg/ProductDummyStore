@@ -1,12 +1,12 @@
-package com.example.dummyjsonapp.ui
+package com.example.dummyjsonapp.presentation.home
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dummyjsonapp.data.local.entity.CartItem
-import com.example.dummyjsonapp.data.remote.dto.Category
 import com.example.dummyjsonapp.data.local.entity.ProductEntity
+import com.example.dummyjsonapp.data.remote.dto.Category
 import com.example.dummyjsonapp.data.repository.ProductRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -15,7 +15,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProductViewModel @Inject constructor(
-    private val repository : ProductRepository) : ViewModel() {
+    private val repository : ProductRepository
+) : ViewModel() {
 
     // LiveData chứa danh sách sản phẩm
     private val _products = MutableLiveData<List<ProductEntity>>()

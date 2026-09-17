@@ -1,4 +1,4 @@
-package com.example.dummyjsonapp.ui
+package com.example.dummyjsonapp.presentation.favotite
 
 import android.content.Intent
 import android.os.Bundle
@@ -8,10 +8,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dummyjsonapp.databinding.FragmentFavoriteBinding
+import com.example.dummyjsonapp.presentation.home.ProductAdapter
+import com.example.dummyjsonapp.presentation.home.ProductViewModel
+import com.example.dummyjsonapp.presentation.product.DetailActivity
 import dagger.hilt.android.AndroidEntryPoint
-
 
 @AndroidEntryPoint
 class FavoriteFragment : Fragment() {

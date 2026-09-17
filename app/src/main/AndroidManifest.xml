@@ -5,7 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:name=".DummyApplication"
+        android:name=".core.DummyApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -15,11 +15,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.DummyJsonApp">
         <activity
-            android:name=".ui.MainActivity"
+            android:name=".presentation.main.MainActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".ui.SplashActivity"
+            android:name=".presentation.splash.SplashActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
@@ -29,23 +29,23 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.OnboardingActivity"
+            android:name=".presentation.onboarding.OnboardingActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".ui.DetailActivity"
+            android:name=".presentation.product.DetailActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".ui.LanguageActivity"
+            android:name=".presentation.language.LanguageActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".ui.CheckoutActivity"
+            android:name=".presentation.checkout.CheckoutActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".ui.OrderSuccessActivity"
+            android:name=".presentation.checkout.OrderSuccessActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
     </application>

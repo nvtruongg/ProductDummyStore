@@ -1,4 +1,4 @@
-package com.example.dummyjsonapp.ui
+package com.example.dummyjsonapp.presentation.main
 
 import android.os.Bundle
 import android.widget.Toast
@@ -7,6 +7,9 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.example.dummyjsonapp.R
 import com.example.dummyjsonapp.databinding.ActivityMainBinding
+import com.example.dummyjsonapp.presentation.cart.CartFragment
+import com.example.dummyjsonapp.presentation.favotite.FavoriteFragment
+import com.example.dummyjsonapp.presentation.home.HomeFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

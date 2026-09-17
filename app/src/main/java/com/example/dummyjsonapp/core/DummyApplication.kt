@@ -1,4 +1,4 @@
-package com.example.dummyjsonapp
+package com.example.dummyjsonapp.core
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
