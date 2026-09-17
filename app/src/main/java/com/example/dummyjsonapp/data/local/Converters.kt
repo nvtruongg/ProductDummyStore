@@ -1,8 +1,8 @@
 package com.example.dummyjsonapp.data.local
 
 import androidx.room.TypeConverter
-import com.example.dummyjsonapp.data.local.entity.Dimensions
-import com.example.dummyjsonapp.data.local.entity.Review
+import com.example.dummyjsonapp.data.local.entity.ProductDimensions
+import com.example.dummyjsonapp.data.local.entity.ProductReview
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -19,25 +19,25 @@ class Converters {
     }
 
     @TypeConverter
-    fun fromDimensions(value: Dimensions?): String? {
+    fun fromDimensions(value: ProductDimensions?): String? {
         return Gson().toJson(value)
     }
 
     @TypeConverter
-    fun toDimensions(value: String?): Dimensions? {
+    fun toDimensions(value: String?): ProductDimensions? {
         if (value.isNullOrEmpty()) return null
-        return Gson().fromJson(value, Dimensions::class.java)
+        return Gson().fromJson(value, ProductDimensions::class.java)
     }
 
     @TypeConverter
-    fun fromReviewList(value: List<Review>?): String? {
+    fun fromReviewList(value: List<ProductReview>?): String? {
         return Gson().toJson(value)
     }
 
     @TypeConverter
-    fun toReviewList(value: String?): List<Review>? {
+    fun toReviewList(value: String?): List<ProductReview>? {
         if (value.isNullOrEmpty()) return null
-        val listType = object : TypeToken<List<Review>>() {}.type
+        val listType = object : TypeToken<List<ProductReview>>() {}.type
         return Gson().fromJson(value, listType)
     }
 }

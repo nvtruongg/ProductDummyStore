@@ -9,11 +9,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.dummyjsonapp.R
 import com.example.dummyjsonapp.databinding.ItemProductBinding
-import com.example.dummyjsonapp.data.local.entity.Product
+import com.example.dummyjsonapp.data.local.entity.ProductEntity
 
-class ProductAdapter(private val onItemClick: (Product) -> Unit,
-    private val onFavoriteClick: (Product, Boolean) -> Unit) :
-    ListAdapter<Product, ProductAdapter.ProductViewHolder>(ProductDiffCallback()) {
+class ProductAdapter(private val onItemClick: (ProductEntity) -> Unit,
+                     private val onFavoriteClick: (ProductEntity, Boolean) -> Unit) :
+    ListAdapter<ProductEntity, ProductAdapter.ProductViewHolder>(ProductDiffCallback()) {
 
     private var favoriteProductIds: Set<Int> = emptySet()
     fun updateFavorites(newFavorites: Set<Int>) {
@@ -34,7 +34,7 @@ class ProductAdapter(private val onItemClick: (Product) -> Unit,
 
     // Lớp nắm giữ giao diện của 1 item
     inner class ProductViewHolder(private val binding: ItemProductBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(product: Product) {
+        fun bind(product: ProductEntity) {
             binding.tvTitle.text = product.title
             binding.tvPrice.text = "$${product.price}"
             binding.tvRating.text = "⭐ ${product.rating}"
@@ -78,12 +78,12 @@ class ProductAdapter(private val onItemClick: (Product) -> Unit,
     }
 
     // Bộ lọc DiffUtil
-    class ProductDiffCallback : DiffUtil.ItemCallback<Product>() {
-        override fun areItemsTheSame(oldItem: Product, newItem: Product): Boolean {
+    class ProductDiffCallback : DiffUtil.ItemCallback<ProductEntity>() {
+        override fun areItemsTheSame(oldItem: ProductEntity, newItem: ProductEntity): Boolean {
             return oldItem.id == newItem.id
         }
 
-        override fun areContentsTheSame(oldItem: Product, newItem: Product): Boolean {
+        override fun areContentsTheSame(oldItem: ProductEntity, newItem: ProductEntity): Boolean {
             return oldItem == newItem
         }
     }

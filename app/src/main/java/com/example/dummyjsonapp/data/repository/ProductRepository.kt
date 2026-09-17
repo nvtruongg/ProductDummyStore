@@ -6,7 +6,7 @@ import com.example.dummyjsonapp.data.local.entity.CartEntity
 import com.example.dummyjsonapp.data.local.entity.CartItem
 import com.example.dummyjsonapp.data.remote.dto.Category
 import com.example.dummyjsonapp.data.local.entity.FavoriteEntity
-import com.example.dummyjsonapp.data.local.entity.Product
+import com.example.dummyjsonapp.data.local.entity.ProductEntity
 import javax.inject.Inject
 
 class ProductRepository @Inject constructor(
@@ -14,7 +14,7 @@ class ProductRepository @Inject constructor(
     private val productDao : ProductDao
 ) {
     //lấy dữu liệu từ room
-    suspend fun getProductsFromLocal(): List<Product>{
+    suspend fun getProductsFromLocal(): List<ProductEntity>{
         return productDao.getAllProducts()
     }
     //lấy dữ lieeuj từ api và lưu vào room
@@ -32,11 +32,11 @@ class ProductRepository @Inject constructor(
             Result.failure(e)
         }
     }
-    suspend fun getProductById(id: Int): Product? {
+    suspend fun getProductById(id: Int): ProductEntity? {
         return productDao.getProductById(id)
     }
     // Nối với API Tìm kiếm
-    suspend fun searchProductsFromApi(keyword: String): Result<List<Product>> {
+    suspend fun searchProductsFromApi(keyword: String): Result<List<ProductEntity>> {
         return try {
             val response = apiService.searchProducts(keyword)
             if (response.isSuccessful && response.body() != null) {
@@ -69,7 +69,7 @@ class ProductRepository @Inject constructor(
         }
     }
 
-    suspend fun getProductsByCategoryFromApi(categorySlug: String): Result<List<Product>> {
+    suspend fun getProductsByCategoryFromApi(categorySlug: String): Result<List<ProductEntity>> {
         return try {
             val response = apiService.getProductsByCategory(categorySlug)
 
@@ -100,7 +100,7 @@ class ProductRepository @Inject constructor(
     suspend fun getAllFavoriteIds(): List<Int> {
         return productDao.getAllFavoriteIds()
     }
-    suspend fun getFavoritedProducts(): Result<List<Product>> {
+    suspend fun getFavoritedProducts(): Result<List<ProductEntity>> {
         return try {
             val favorites = productDao.getFavoritedProducts()
             Result.success(favorites)

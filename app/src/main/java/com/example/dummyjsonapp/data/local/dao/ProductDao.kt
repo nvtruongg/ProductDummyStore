@@ -7,24 +7,24 @@ import androidx.room.Query
 import com.example.dummyjsonapp.data.local.entity.CartEntity
 import com.example.dummyjsonapp.data.local.entity.CartItem
 import com.example.dummyjsonapp.data.local.entity.FavoriteEntity
-import com.example.dummyjsonapp.data.local.entity.Product
+import com.example.dummyjsonapp.data.local.entity.ProductEntity
 
 @Dao
 interface ProductDao {
     @Query("select * from products")
-    suspend fun getAllProducts(): List<Product>
+    suspend fun getAllProducts(): List<ProductEntity>
 
     @Query("SELECT * FROM products WHERE id = :productId")
-    suspend fun getProductById(productId: Int): Product?
+    suspend fun getProductById(productId: Int): ProductEntity?
 
     @Query("SELECT * FROM products WHERE category = :categorySlug")
-    suspend fun getProductsByCategory(categorySlug: String): List<Product>
+    suspend fun getProductsByCategory(categorySlug: String): List<ProductEntity>
 
     @Query("SELECT * FROM products WHERE title LIKE '%' || :keyword || '%' OR description LIKE '%' || :keyword || '%'")
-    suspend fun searchProducts(keyword: String): List<Product>
+    suspend fun searchProducts(keyword: String): List<ProductEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertProducts(products: List<Product>)
+    suspend fun insertProducts(products: List<ProductEntity>)
 
     @Query("DELETE FROM products")
     suspend fun clearAllProducts()
@@ -41,7 +41,7 @@ interface ProductDao {
     suspend fun getAllFavoriteIds(): List<Int>
 
     @Query("SELECT products.* FROM products INNER JOIN favorites ON products.id = favorites.productId")
-    suspend fun getFavoritedProducts(): List<Product>
+    suspend fun getFavoritedProducts(): List<ProductEntity>
 
     // --- CÁC HÀM CHO GIỎ HÀNG (CART) ---
 

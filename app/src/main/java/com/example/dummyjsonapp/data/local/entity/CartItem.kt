@@ -4,6 +4,6 @@ import androidx.room.ColumnInfo
 import androidx.room.Embedded
 
 class CartItem (
-    @Embedded val product: Product,
+    @Embedded val product: ProductEntity,
     @ColumnInfo(name = "quantity") var quantity: Int
 )

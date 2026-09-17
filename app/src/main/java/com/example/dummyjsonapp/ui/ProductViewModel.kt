@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dummyjsonapp.data.local.entity.CartItem
 import com.example.dummyjsonapp.data.remote.dto.Category
-import com.example.dummyjsonapp.data.local.entity.Product
+import com.example.dummyjsonapp.data.local.entity.ProductEntity
 import com.example.dummyjsonapp.data.repository.ProductRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -18,8 +18,8 @@ class ProductViewModel @Inject constructor(
     private val repository : ProductRepository) : ViewModel() {
 
     // LiveData chứa danh sách sản phẩm
-    private val _products = MutableLiveData<List<Product>>()
-    val products: LiveData<List<Product>> = _products
+    private val _products = MutableLiveData<List<ProductEntity>>()
+    val products: LiveData<List<ProductEntity>> = _products
     private val _categories = MutableLiveData<List<Category>>()
     val categories: LiveData<List<Category>> = _categories
 
@@ -34,8 +34,8 @@ class ProductViewModel @Inject constructor(
     private val _favoriteIds = MutableLiveData<Set<Int>>(emptySet())
     val favoriteIds: LiveData<Set<Int>> = _favoriteIds
 
-    private val _favoritedProductsList = MutableLiveData<List<Product>>()
-    val favoritedProductsList: LiveData<List<Product>> = _favoritedProductsList
+    private val _favoritedProductsList = MutableLiveData<List<ProductEntity>>()
+    val favoritedProductsList: LiveData<List<ProductEntity>> = _favoritedProductsList
 
     //livedate cho Cart
     private val _cartItems = MutableLiveData<List<CartItem>>()
@@ -73,8 +73,8 @@ class ProductViewModel @Inject constructor(
         }
     }
     //live data dành cho detail
-    private val _selectedProduct = MutableLiveData<Product?>()
-    val selectedProduct: LiveData<Product?> = _selectedProduct
+    private val _selectedProduct = MutableLiveData<ProductEntity?>()
+    val selectedProduct: LiveData<ProductEntity?> = _selectedProduct
 
     fun loadProductDetail(productId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
