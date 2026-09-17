@@ -1,4 +1,4 @@
-package com.example.dummyjsonapp.data.model
+package com.example.dummyjsonapp.data.remote.dto
 
 data class Category(
     val slug : String,

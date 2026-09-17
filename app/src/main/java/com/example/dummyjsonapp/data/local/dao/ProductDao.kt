@@ -5,9 +5,9 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.dummyjsonapp.data.local.entity.CartEntity
-import com.example.dummyjsonapp.data.model.CartItem
+import com.example.dummyjsonapp.data.local.entity.CartItem
 import com.example.dummyjsonapp.data.local.entity.FavoriteEntity
-import com.example.dummyjsonapp.data.model.Product
+import com.example.dummyjsonapp.data.local.entity.Product
 
 @Dao
 interface ProductDao {

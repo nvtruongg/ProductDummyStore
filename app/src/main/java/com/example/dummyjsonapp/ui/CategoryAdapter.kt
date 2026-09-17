@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.dummyjsonapp.databinding.ItemCategoryBinding
-import com.example.dummyjsonapp.data.model.Category
+import com.example.dummyjsonapp.data.remote.dto.Category
 
 class CategoryAdapter(
     private var categories: List<Category>,

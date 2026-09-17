@@ -7,9 +7,8 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.dummyjsonapp.data.local.dao.ProductDao
 import com.example.dummyjsonapp.data.local.entity.CartEntity
-import com.example.dummyjsonapp.data.model.Converters
 import com.example.dummyjsonapp.data.local.entity.FavoriteEntity
-import com.example.dummyjsonapp.data.model.Product
+import com.example.dummyjsonapp.data.local.entity.Product
 
 @Database(entities = [Product::class, FavoriteEntity::class, CartEntity::class], version = 4, exportSchema = false)
 @TypeConverters(Converters::class)

@@ -9,8 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.dummyjsonapp.R
 import com.example.dummyjsonapp.databinding.ItemProductBinding
-import com.example.dummyjsonapp.data.model.Product
-import kotlin.math.roundToInt
+import com.example.dummyjsonapp.data.local.entity.Product
 
 class ProductAdapter(private val onItemClick: (Product) -> Unit,
     private val onFavoriteClick: (Product, Boolean) -> Unit) :

@@ -1,4 +1,4 @@
-package com.example.dummyjsonapp.data.model
+package com.example.dummyjsonapp.data.local.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Embedded

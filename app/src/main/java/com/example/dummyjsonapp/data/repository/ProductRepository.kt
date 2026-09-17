@@ -3,10 +3,10 @@ package com.example.dummyjsonapp.data.repository
 import com.example.dummyjsonapp.data.remote.ApiService
 import com.example.dummyjsonapp.data.local.dao.ProductDao
 import com.example.dummyjsonapp.data.local.entity.CartEntity
-import com.example.dummyjsonapp.data.model.CartItem
-import com.example.dummyjsonapp.data.model.Category
+import com.example.dummyjsonapp.data.local.entity.CartItem
+import com.example.dummyjsonapp.data.remote.dto.Category
 import com.example.dummyjsonapp.data.local.entity.FavoriteEntity
-import com.example.dummyjsonapp.data.model.Product
+import com.example.dummyjsonapp.data.local.entity.Product
 import javax.inject.Inject
 
 class ProductRepository @Inject constructor(
