@@ -1,13 +1,14 @@
-package com.example.dummyjsonapp.core.database
+package com.example.dummyjsonapp.data.local
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.example.dummyjsonapp.data.model.CartEntity
+import com.example.dummyjsonapp.data.local.dao.ProductDao
+import com.example.dummyjsonapp.data.local.entity.CartEntity
 import com.example.dummyjsonapp.data.model.Converters
-import com.example.dummyjsonapp.data.model.FavoriteEntity
+import com.example.dummyjsonapp.data.local.entity.FavoriteEntity
 import com.example.dummyjsonapp.data.model.Product
 
 @Database(entities = [Product::class, FavoriteEntity::class, CartEntity::class], version = 4, exportSchema = false)

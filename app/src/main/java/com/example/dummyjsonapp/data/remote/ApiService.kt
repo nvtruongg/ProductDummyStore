@@ -1,4 +1,4 @@
-package com.example.dummyjsonapp.core.network
+package com.example.dummyjsonapp.data.remote
 
 import com.example.dummyjsonapp.data.model.Category
 import com.example.dummyjsonapp.data.model.ProductResponse

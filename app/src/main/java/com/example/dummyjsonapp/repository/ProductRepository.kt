@@ -1,11 +1,11 @@
 package com.example.dummyjsonapp.repository
 
-import com.example.dummyjsonapp.core.network.ApiService
-import com.example.dummyjsonapp.core.database.ProductDao
-import com.example.dummyjsonapp.data.model.CartEntity
+import com.example.dummyjsonapp.data.remote.ApiService
+import com.example.dummyjsonapp.data.local.dao.ProductDao
+import com.example.dummyjsonapp.data.local.entity.CartEntity
 import com.example.dummyjsonapp.data.model.CartItem
 import com.example.dummyjsonapp.data.model.Category
-import com.example.dummyjsonapp.data.model.FavoriteEntity
+import com.example.dummyjsonapp.data.local.entity.FavoriteEntity
 import com.example.dummyjsonapp.data.model.Product
 import javax.inject.Inject
 
