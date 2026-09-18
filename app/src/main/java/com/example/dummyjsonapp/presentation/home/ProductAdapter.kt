@@ -18,9 +18,9 @@ class ProductAdapter(private val onItemClick: (ProductEntity) -> Unit,
     private var favoriteProductIds: Set<Int> = emptySet()
     fun updateFavorites(newFavorites: Set<Int>) {
         favoriteProductIds = newFavorites
-        notifyDataSetChanged() // Cập nhật lại UI khi có thay đổi tim
+        notifyDataSetChanged()
     }
-    // Tạo ViewHolder bằng ViewBinding
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
         val binding = ItemProductBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ProductViewHolder(binding)
@@ -32,14 +32,12 @@ class ProductAdapter(private val onItemClick: (ProductEntity) -> Unit,
         holder.bind(product)
     }
 
-    // Lớp nắm giữ giao diện của 1 item
     inner class ProductViewHolder(private val binding: ItemProductBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(product: ProductEntity) {
             binding.tvTitle.text = product.title
             binding.tvPrice.text = "$${product.price}"
             binding.tvRating.text = "⭐ ${product.rating}"
 
-            // Xử lý nhãn giảm giá: Chỉ hiển thị khi giảm từ 1% trở lên
             if (product.discountPercentage >= 1.0) {
                 val discount = product.discountPercentage
                 binding.tvDiscount.text = "-$discount%"
@@ -48,14 +46,12 @@ class ProductAdapter(private val onItemClick: (ProductEntity) -> Unit,
                 binding.tvDiscount.visibility = View.GONE
             }
 
-            // Tải ảnh từ URL nhét vào ImageView
             Glide.with(binding.root.context)
                 .load(product.thumbnail)
                 .into(binding.ivThumbnail)
 
-            // Khi người dùng bấm vào toàn bộ thẻ CardView (root)
             binding.root.setOnClickListener {
-                onItemClick(product) // Bắn dữ liệu sản phẩm đó ra ngoài
+                onItemClick(product)
             }
 
             val isFavorited = favoriteProductIds.contains(product.id)
@@ -67,7 +63,6 @@ class ProductAdapter(private val onItemClick: (ProductEntity) -> Unit,
 
             // Bắt sự kiện click vào trái tim
             binding.ivFavorite.setOnClickListener {
-                // Đảo ngược trạng thái hiện tại và báo ra ngoài cho ViewModel xử lý
                 onFavoriteClick(product, !isFavorited)
             }
 

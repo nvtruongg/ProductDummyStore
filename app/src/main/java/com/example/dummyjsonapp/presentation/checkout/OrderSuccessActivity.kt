@@ -14,11 +14,9 @@ class OrderSuccessActivity : AppCompatActivity() {
         binding = ActivityOrderSuccessBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Nhận mã đơn hàng từ màn Checkout truyền sang
         val orderCode = intent.getStringExtra("ORDER_CODE") ?: "N/A"
         binding.tvOrderSuccessCode.text = "Mã đơn hàng: $orderCode"
 
-        // Xử lý nút Quay về trang chủ
         binding.btnContinueShopping.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             // Cờ này giúp xóa toàn bộ các màn hình Checkout/Detail đang mở đè lên nhau

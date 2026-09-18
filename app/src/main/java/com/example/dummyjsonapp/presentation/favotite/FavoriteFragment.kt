@@ -48,7 +48,6 @@ class FavoriteFragment : Fragment() {
         observeViewModel()
     }
     private fun observeViewModel() {
-        // Lắng nghe danh sách sản phẩm yêu thích (có chứa ảnh, tên, giá)
         viewModel.favoriteProductsList.observe(viewLifecycleOwner) { products ->
             adapter.submitList(products)
 
@@ -61,7 +60,6 @@ class FavoriteFragment : Fragment() {
             }
         }
 
-        // Lắng nghe danh sách ID để cập nhật trạng thái icon trái tim
         viewModel.favoriteIds.observe(viewLifecycleOwner) { ids ->
             adapter.updateFavorites(ids)
         }

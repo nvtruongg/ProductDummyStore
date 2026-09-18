@@ -39,7 +39,6 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 1. Categories
         val categoryAdapter = CategoryAdapter(emptyList()) { clickedCategory ->
             viewModel.filterByCategory(clickedCategory.slug)
         }
@@ -47,7 +46,6 @@ class HomeFragment : Fragment() {
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         binding.rvCategories.adapter = categoryAdapter
 
-        // 2. Ô tìm kiếm
         binding.edtSearch.addTextChangedListener {
             searchJob?.cancel()
             searchJob = lifecycleScope.launch {
@@ -71,7 +69,6 @@ class HomeFragment : Fragment() {
             false
         }
 
-        // 3. RecyclerView Sản phẩm
         adapter = ProductAdapter(
             onItemClick = { clickedProduct ->
                 val intent = Intent(requireContext(), DetailActivity::class.java)
@@ -85,7 +82,6 @@ class HomeFragment : Fragment() {
         binding.recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
         binding.recyclerView.adapter = adapter
 
-        // 4. Lắng nghe dữ liệu
         observeViewModel()
     }
 
@@ -124,7 +120,6 @@ class HomeFragment : Fragment() {
         }
     }
 
-    // Xóa binding khi Fragment bị hủy để giải phóng bộ nhớ
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

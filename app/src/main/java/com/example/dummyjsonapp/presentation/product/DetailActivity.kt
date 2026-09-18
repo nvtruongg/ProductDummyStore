@@ -45,7 +45,7 @@ class DetailActivity : AppCompatActivity() {
                 viewModel.addToCart(product_id)
                 Toast.makeText(this, "Chuyển đến giỏ hàng...", Toast.LENGTH_SHORT).show()
                 // TODO: Mở màn hình Giỏ hàng hoặc Thanh toán sau
-                finish() // Tạm thời đóng màn detail lại
+                finish()
             }
         }
         observeViewModel()

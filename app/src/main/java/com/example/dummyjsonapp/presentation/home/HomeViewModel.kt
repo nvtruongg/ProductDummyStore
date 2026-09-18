@@ -39,11 +39,9 @@ class HomeViewModel @Inject constructor (
         viewModelScope.launch(Dispatchers.IO) {
             _isLoading.postValue(true)
 
-            // b1. đọc dữ liệu từ Room
             val localData = repository.getProductsFromLocal()
             _products.postValue(localData)
 
-            // b2. gọi mạng để làm mới dữ liệu
             val refreshResult = repository.refreshProducts()
             refreshResult.onSuccess {
                 val updatedData = repository.getProductsFromLocal()
@@ -64,10 +62,8 @@ class HomeViewModel @Inject constructor (
             result.onSuccess { categoryList ->
                 val categoryAll = Category(slug = "", name = "Tất cả", url = "")
                 val displayList = listOf(categoryAll) + categoryList
-                // Nếu thành công, đẩy danh sách livedata
                 _categories.postValue(displayList)
             }.onFailure {
-                // Nếu lỗi, tạm thời truyền list rỗng hoặc báo lỗi
                 _categories.postValue(emptyList())
             }
         }
@@ -89,13 +85,10 @@ class HomeViewModel @Inject constructor (
         }
     }
     fun filterByCategory(slug: String) {
-        // Kiểm tra slug rỗng không -> Tất cả
         if (slug.isEmpty()) {
-            loadData() // Nếu là "Tất cả", tải lại danh sách gốc từ đầu
+            loadData()
             return
         }
-
-        // Nếu là danh mục cụ thể, tiến hành gọi API lọc
         viewModelScope.launch(Dispatchers.IO) {
             _isLoading.postValue(true)
 
@@ -104,7 +97,7 @@ class HomeViewModel @Inject constructor (
                 _products.postValue(filteredList)
                 _errorMessage.postValue(null)
             }.onFailure { exception ->
-                _products.postValue(emptyList()) // Trả về list rỗng để hiện thông báo "Không tìm thấy"
+                _products.postValue(emptyList())
                 _errorMessage.postValue("Lỗi: ${exception.message}")
             }
 

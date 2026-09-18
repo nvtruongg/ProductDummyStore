@@ -18,19 +18,14 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // 1. Khởi tạo ViewBinding
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Lấy controller để điều khiển system bars
         val insetsController = WindowInsetsControllerCompat(window, window.decorView)
-        // Ẩn navigation bar
         insetsController.hide(WindowInsetsCompat.Type.navigationBars())
-        // Tuỳ chọn: cho phép người dùng vuốt để hiện lại
         insetsController.systemBarsBehavior =
             WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 
-        // Nạp HomeFragment lần đầu nếu chưa có savedInstanceState
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
                 .replace(R.id.fragmentContainer, HomeFragment())
