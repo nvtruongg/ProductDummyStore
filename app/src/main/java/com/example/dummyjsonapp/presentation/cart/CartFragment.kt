@@ -11,7 +11,6 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dummyjsonapp.databinding.FragmentCartBinding
 import com.example.dummyjsonapp.presentation.checkout.CheckoutActivity
-import com.example.dummyjsonapp.presentation.home.ProductViewModel
 import com.example.dummyjsonapp.presentation.product.DetailActivity
 import dagger.hilt.android.AndroidEntryPoint
 

@@ -9,7 +9,6 @@ import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.example.dummyjsonapp.R
 import com.example.dummyjsonapp.databinding.ActivityCheckoutBinding
-import com.example.dummyjsonapp.presentation.home.ProductViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlin.math.roundToInt
 

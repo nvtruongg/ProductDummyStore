@@ -10,7 +10,6 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.dummyjsonapp.databinding.FragmentFavoriteBinding
 import com.example.dummyjsonapp.presentation.home.ProductAdapter
-import com.example.dummyjsonapp.presentation.home.ProductViewModel
 import com.example.dummyjsonapp.presentation.product.DetailActivity
 import dagger.hilt.android.AndroidEntryPoint
 
