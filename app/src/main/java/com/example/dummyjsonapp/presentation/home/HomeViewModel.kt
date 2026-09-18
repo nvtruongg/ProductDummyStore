@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.dummyjsonapp.data.local.entity.CartItem
 import com.example.dummyjsonapp.data.local.entity.ProductEntity
 import com.example.dummyjsonapp.data.remote.dto.Category
 import com.example.dummyjsonapp.data.repository.ProductRepository
@@ -14,41 +13,26 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ProductViewModel @Inject constructor(
-    private val repository : ProductRepository
+class HomeViewModel @Inject constructor (
+    private val repository: ProductRepository
 ) : ViewModel() {
-
-    // LiveData chứa danh sách sản phẩm
     private val _products = MutableLiveData<List<ProductEntity>>()
     val products: LiveData<List<ProductEntity>> = _products
     private val _categories = MutableLiveData<List<Category>>()
     val categories: LiveData<List<Category>> = _categories
 
-    // LiveData quản lý trạng thái  (Loading)
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
 
-    // LiveData lưu thông báo lỗi nếu có
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> = _errorMessage
 
     private val _favoriteIds = MutableLiveData<Set<Int>>(emptySet())
     val favoriteIds: LiveData<Set<Int>> = _favoriteIds
 
-    private val _favoritedProductsList = MutableLiveData<List<ProductEntity>>()
-    val favoritedProductsList: LiveData<List<ProductEntity>> = _favoritedProductsList
-
-    //livedate cho Cart
-    private val _cartItems = MutableLiveData<List<CartItem>>()
-    val cartItems: LiveData<List<CartItem>> = _cartItems
-
-    private val _totalPrice = MutableLiveData<Double>()
-    val totalPrice: LiveData<Double> = _totalPrice
-
     init {
         loadData()
         loadCategories()
-        loadFavorites()
     }
     fun loadData() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -71,16 +55,6 @@ class ProductViewModel @Inject constructor(
             }
 
             _isLoading.postValue(false)
-        }
-    }
-    //live data dành cho detail
-    private val _selectedProduct = MutableLiveData<ProductEntity?>()
-    val selectedProduct: LiveData<ProductEntity?> = _selectedProduct
-
-    fun loadProductDetail(productId: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val product = repository.getProductById(productId)
-            _selectedProduct.postValue(product)
         }
     }
     fun loadCategories() {
@@ -138,73 +112,9 @@ class ProductViewModel @Inject constructor(
             _isLoading.postValue(false)
         }
     }
-    // Tải danh sách tim từ Database lên
-    fun loadFavorites() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val ids = repository.getAllFavoriteIds().toSet()
-            _favoriteIds.postValue(ids)
-        }
-    }
-
     fun toggleFavorite(productId: Int, isFavorite: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.toggleFavorite(productId, isFavorite)
-            loadFavorites() // Cập nhật lại danh sách ngay lập tức
-            loadFavoritedProductsList()
-        }
-    }
-
-    fun loadFavoritedProductsList() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val result = repository.getFavoritedProducts()
-            if (result.isSuccess) {
-                _favoritedProductsList.postValue(result.getOrDefault(emptyList()))
-            }
-        }
-    }
-
-    fun addToCart(productId: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val success = repository.addToCart(productId)
-            if (success) {
-                _errorMessage.postValue("Đã thêm vào giỏ hàng!")
-            } else {
-                _errorMessage.postValue("Số lượng vượt quá tồn kho!")
-            }
-        }
-    }
-    fun loadCart() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val items = repository.getCartItems()
-            _cartItems.postValue(items)
-
-            // Tính tổng tiền: Giá * Số lượng
-            val total = items.sumOf { it.product.price * it.quantity }
-            _totalPrice.postValue(total)
-        }
-    }
-
-    fun updateCartQuantity(productId: Int, newQuantity: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val success = repository.updateCartQuantity(productId, newQuantity)
-            if (!success) {
-                _errorMessage.postValue("Số lượng vượt quá tồn kho!")
-            }
-            loadCart()
-        }
-    }
-
-    fun removeCartItem(productId: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.removeFromCart(productId)
-            loadCart() // Tải lại giỏ hàng sau khi xóa
-        }
-    }
-    fun placeOrder() {
-        viewModelScope.launch(Dispatchers.IO) {
-            //TODO: phát triển bảng OrderEntity,insert thông tin đơn hàng vào đây
-            repository.clearCart()
-            loadCart()
         }
     }
 }

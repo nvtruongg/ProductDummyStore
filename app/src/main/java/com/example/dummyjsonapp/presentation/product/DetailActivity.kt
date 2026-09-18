@@ -14,7 +14,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class DetailActivity : AppCompatActivity() {
     private lateinit var binding: ActivityDetailBinding
-    private val viewModel: ProductViewModel by viewModels()
+    private val viewModel: ProductDetailViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,15 +28,40 @@ class DetailActivity : AppCompatActivity() {
         insetsController.systemBarsBehavior =
             WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 
-        // lấy dữ liệu từ intent
-        val product_id = intent.getIntExtra("product_id", -1)
+        val product_id = intent.getIntExtra("product_id", -1)//từ HomeFragment
         if(product_id != -1){
             viewModel.loadProductDetail(product_id)
         }
 
+        loadDetailProduct()
+
+        binding.btnAddCart.setOnClickListener {
+            if (product_id != -1) {
+                viewModel.addToCart(product_id)
+            }
+        }
+
+        binding.btnBuyNow.setOnClickListener {
+            if (product_id != -1) {
+                viewModel.addToCart(product_id)
+                Toast.makeText(this, "Chuyển đến giỏ hàng...", Toast.LENGTH_SHORT).show()
+                // TODO: Mở màn hình Giỏ hàng hoặc Thanh toán sau
+                finish() // Tạm thời đóng màn detail lại
+            }
+        }
+        observeViewModel()
+    }
+    private fun observeViewModel(){
+        viewModel.errorMessage.observe(this) { message ->
+            if (message != null) {
+                Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+    private fun loadDetailProduct(){
         viewModel.selectedProduct.observe(this){ product ->
             if(product != null) {
-                // đổ dữ liệu cơ bản
+
                 binding.tvDetailTitle.text = "${product.brand ?: ""} ${product.title}".trim()
                 val originalPrice = product.price / (1 - product.discountPercentage / 100)
                 binding.tvDetailPrice.text =
@@ -47,7 +72,6 @@ class DetailActivity : AppCompatActivity() {
                 binding.tvDetailRating.text = "⭐ ${product.rating}/5 | Kho: ${product.stock}"
                 binding.tvDescription.text = product.description
 
-                // Tổng hợp các thông số kỹ thuật và độ bền thành một chuỗi
                 val specsBuilder = StringBuilder()
                 specsBuilder.append("• Thương hiệu: ${product.brand ?: "Đang cập nhật"}\n")
                 specsBuilder.append("• Trọng lượng: ${product.weight ?: 0}g\n")
@@ -61,7 +85,6 @@ class DetailActivity : AppCompatActivity() {
 
                 binding.tvTechnicalSpecs.text = specsBuilder.toString()
 
-                // Hiển thị bình luận
                 if (!product.reviews.isNullOrEmpty()) {
                     val reviewText = product.reviews.joinToString("\n\n") { rev ->
                         "${rev.rating} ⭐ - ${rev.reviewerName}\n\"${rev.comment}\""
@@ -71,8 +94,6 @@ class DetailActivity : AppCompatActivity() {
                     binding.tvReview.text = "Chưa có đánh giá nào."
                 }
 
-
-                //trượt ảnh
                 if (product.images.isNotEmpty()) {
                     val sliderAdapter = ImageSliderAdapter(product.images)
                     binding.viewPagerImages.adapter = sliderAdapter
@@ -81,30 +102,6 @@ class DetailActivity : AppCompatActivity() {
                 binding.btnBack.setOnClickListener {
                     finish()
                 }
-            }
-        }
-        binding.btnAddCart.setOnClickListener {
-            if (product_id != -1) {
-                viewModel.addToCart(product_id)
-                Toast.makeText(this, "Đã thêm vào giỏ hàng!", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        binding.btnBuyNow.setOnClickListener {
-            if (product_id != -1) {
-                viewModel.addToCart(product_id)
-                Toast.makeText(this, "Chuyển đến giỏ hàng...", Toast.LENGTH_SHORT).show()
-                // TODO: Mở màn hình Giỏ hàng hoặc Thanh toán sau
-                finish() // Tạm thời đóng màn detail lại
-            }
-        }
-        oserveViewModel()
-    }
-
-    private fun oserveViewModel() {
-        viewModel.errorMessage.observe(this) { message ->
-            if (message != null) {
-                Toast.makeText(this, message, Toast.LENGTH_LONG).show()
             }
         }
     }

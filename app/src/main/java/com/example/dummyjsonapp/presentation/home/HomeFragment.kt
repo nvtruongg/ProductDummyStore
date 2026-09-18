@@ -28,7 +28,7 @@ class HomeFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var adapter: ProductAdapter
-    private val viewModel: ProductViewModel by viewModels()
+    private val viewModel: HomeViewModel by viewModels()
     private var searchJob: Job? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -116,7 +116,7 @@ class HomeFragment : Fragment() {
 
         viewModel.errorMessage.observe(viewLifecycleOwner) { message ->
             if (message != null) {
-                Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
             }
         }
 
