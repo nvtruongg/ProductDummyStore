@@ -21,9 +21,7 @@ class CartAdapter (
         fun bind(cartItem: CartItem) {
             val product = cartItem.product
 
-            // 1. Gán dữ liệu văn bản
             binding.tvCartTitle.text = product.title
-            // Giả sử giá tiền là USD
             binding.tvCartPrice.text = "$${product.price}"
             binding.tvQuantity.text = cartItem.quantity.toString()
 
@@ -45,7 +43,6 @@ class CartAdapter (
                 onDeleteClick(cartItem)
             }
 
-            // 4. (Tùy chọn) Click vào cả item để xem lại chi tiết
             binding.root.setOnClickListener {
                 onItemClick(cartItem)
             }

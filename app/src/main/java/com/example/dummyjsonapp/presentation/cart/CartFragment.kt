@@ -21,7 +21,7 @@ class CartFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var adapter: CartAdapter
-    private val viewModel: ProductViewModel by viewModels()
+    private val viewModel: CartViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentCartBinding.inflate(inflater, container, false)
@@ -64,7 +64,6 @@ class CartFragment : Fragment() {
         }
     }
         private fun observeViewModel() {
-            // Lắng nghe danh sách Giỏ hàng
             viewModel.cartItems.observe(viewLifecycleOwner) { items ->
                 adapter.submitList(items)
 
@@ -80,7 +79,6 @@ class CartFragment : Fragment() {
             }
 
             viewModel.totalPrice.observe(viewLifecycleOwner) { total ->
-                // Format làm tròn 2 chữ số thập phân
                 binding.tvTotalPrice.text = String.format("$%.2f", total)
             }
             viewModel.errorMessage.observe(viewLifecycleOwner) { message ->

@@ -16,7 +16,7 @@ import kotlin.math.roundToInt
 @AndroidEntryPoint
 class CheckoutActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCheckoutBinding
-    private val viewModel: ProductViewModel by viewModels()
+    private val viewModel: CheckoutViewModel by viewModels()
 
     // Lưu lại tổng tiền cuối cùng (đã cộng phí ship)
     private var currentFinalTotalUsd: Double = 0.0
