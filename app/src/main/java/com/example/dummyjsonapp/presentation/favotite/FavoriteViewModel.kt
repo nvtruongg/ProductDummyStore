@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dummyjsonapp.data.local.entity.ProductEntity
-import com.example.dummyjsonapp.data.repository.ProductRepository
+import com.example.dummyjsonapp.domain.repository.ProductRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -33,7 +33,7 @@ class FavoriteViewModel @Inject constructor(
     }
     fun loadFavoriteProductsList() {
         viewModelScope.launch(Dispatchers.IO) {
-            val result = repository.getFavoritedProducts()
+            val result = repository.getFavoriteProducts()
             if (result.isSuccess) {
                 _favoriteProductsList.postValue(result.getOrDefault(emptyList()))
             }

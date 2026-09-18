@@ -1,12 +1,11 @@
 package com.example.dummyjsonapp.presentation.product
 
-import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dummyjsonapp.data.local.entity.ProductEntity
-import com.example.dummyjsonapp.data.repository.ProductRepository
+import com.example.dummyjsonapp.domain.repository.ProductRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

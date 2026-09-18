@@ -7,18 +7,19 @@ import com.example.dummyjsonapp.data.local.entity.CartItem
 import com.example.dummyjsonapp.data.remote.dto.Category
 import com.example.dummyjsonapp.data.local.entity.FavoriteEntity
 import com.example.dummyjsonapp.data.local.entity.ProductEntity
+import com.example.dummyjsonapp.domain.repository.ProductRepository
 import javax.inject.Inject
 
-class ProductRepository @Inject constructor(
+class ProductRepositoryImpl @Inject constructor(
     private val apiService: ApiService,
     private val productDao : ProductDao
-) {
+): ProductRepository {
     //lấy dữu liệu từ room
-    suspend fun getProductsFromLocal(): List<ProductEntity>{
+    override suspend fun getProductsFromLocal(): List<ProductEntity>{
         return productDao.getAllProducts()
     }
     //lấy dữ lieeuj từ api và lưu vào room
-    suspend fun refreshProducts(): Result<Unit> {
+    override suspend fun refreshProducts(): Result<Unit> {
         return try {
             val response = apiService.getProducts()
             if (response.isSuccessful && response.body() != null) {
@@ -32,11 +33,11 @@ class ProductRepository @Inject constructor(
             Result.failure(e)
         }
     }
-    suspend fun getProductById(id: Int): ProductEntity? {
+    override suspend fun getProductById(id: Int): ProductEntity? {
         return productDao.getProductById(id)
     }
     // Nối với API Tìm kiếm
-    suspend fun searchProductsFromApi(keyword: String): Result<List<ProductEntity>> {
+    override suspend fun searchProductsFromApi(keyword: String): Result<List<ProductEntity>> {
         return try {
             val response = apiService.searchProducts(keyword)
             if (response.isSuccessful && response.body() != null) {
@@ -56,7 +57,7 @@ class ProductRepository @Inject constructor(
         }
     }
     // Nối với API Danh mục
-    suspend fun getCategoriesFromApi(): Result<List<Category>> {
+    override suspend fun getCategoriesFromApi(): Result<List<Category>> {
         return try {
             val response = apiService.getCategories()
             if(response.isSuccessful && response.body() != null){
@@ -69,7 +70,7 @@ class ProductRepository @Inject constructor(
         }
     }
 
-    suspend fun getProductsByCategoryFromApi(categorySlug: String): Result<List<ProductEntity>> {
+    override suspend fun getProductsByCategoryFromApi(categorySlug: String): Result<List<ProductEntity>> {
         return try {
             val response = apiService.getProductsByCategory(categorySlug)
 
@@ -89,7 +90,7 @@ class ProductRepository @Inject constructor(
             }
         }
     }
-    suspend fun toggleFavorite(productId: Int, isFavorite: Boolean) {
+    override suspend fun toggleFavorite(productId: Int, isFavorite: Boolean) {
         if (isFavorite) {
             productDao.insertFavorite(FavoriteEntity(productId))
         } else {
@@ -97,10 +98,10 @@ class ProductRepository @Inject constructor(
         }
     }
 
-    suspend fun getAllFavoriteIds(): List<Int> {
+    override suspend fun getAllFavoriteIds(): List<Int> {
         return productDao.getAllFavoriteIds()
     }
-    suspend fun getFavoritedProducts(): Result<List<ProductEntity>> {
+    override suspend fun getFavoriteProducts(): Result<List<ProductEntity>> {
         return try {
             val favorites = productDao.getFavoriteProducts()
             Result.success(favorites)
@@ -109,7 +110,7 @@ class ProductRepository @Inject constructor(
         }
     }
 
-    suspend fun addToCart(productId: Int) : Boolean {
+    override suspend fun addToCart(productId: Int) : Boolean {
         val product = productDao.getProductById(productId) ?: return false
         val existingItem = productDao.getCartItemById(productId)
 
@@ -126,11 +127,11 @@ class ProductRepository @Inject constructor(
         return true
     }
 
-    suspend fun getCartItems(): List<CartItem> {
+    override suspend fun getCartItems(): List<CartItem> {
         return productDao.getCartItems()
     }
 
-    suspend fun updateCartQuantity(productId: Int, quantity: Int): Boolean {
+    override suspend fun updateCartQuantity(productId: Int, quantity: Int): Boolean {
         val product = productDao.getProductById(productId) ?: return false
         if(quantity > product.stock) return false
         if (quantity > 0) {
@@ -146,10 +147,10 @@ class ProductRepository @Inject constructor(
         return true
     }
 
-    suspend fun removeFromCart(productId: Int) {
+    override suspend fun removeFromCart(productId: Int) {
         productDao.removeFromCart(productId)
     }
-    suspend fun clearCart() {
+    override suspend fun clearCart() {
         productDao.clearCart()
     }
 }
