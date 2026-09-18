@@ -20,7 +20,7 @@ class FavoriteFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var adapter: ProductAdapter
-    private val viewModel: ProductViewModel by viewModels()
+    private val viewModel: FavoriteViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
@@ -44,13 +44,13 @@ class FavoriteFragment : Fragment() {
         binding.rvFavorites.layoutManager = GridLayoutManager(requireContext(), 2)
         binding.rvFavorites.adapter = adapter
 
-        viewModel.loadFavoritedProductsList()
-        viewModel.loadFavorites()
+        viewModel.loadFavoriteProductsList()
+        viewModel.loadFavoriteIds()
         observeViewModel()
     }
     private fun observeViewModel() {
         // Lắng nghe danh sách sản phẩm yêu thích (có chứa ảnh, tên, giá)
-        viewModel.favoritedProductsList.observe(viewLifecycleOwner) { products ->
+        viewModel.favoriteProductsList.observe(viewLifecycleOwner) { products ->
             adapter.submitList(products)
 
             if (products.isNullOrEmpty()) {

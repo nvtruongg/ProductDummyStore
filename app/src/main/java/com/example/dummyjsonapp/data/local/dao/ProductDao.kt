@@ -41,7 +41,7 @@ interface ProductDao {
     suspend fun getAllFavoriteIds(): List<Int>
 
     @Query("SELECT products.* FROM products INNER JOIN favorites ON products.id = favorites.productId")
-    suspend fun getFavoritedProducts(): List<ProductEntity>
+    suspend fun getFavoriteProducts(): List<ProductEntity>
 
     // --- CÁC HÀM CHO GIỎ HÀNG (CART) ---
 

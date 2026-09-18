@@ -33,6 +33,7 @@ class HomeViewModel @Inject constructor (
     init {
         loadData()
         loadCategories()
+        loadFavoriteIds()
     }
     fun loadData() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -78,8 +79,6 @@ class HomeViewModel @Inject constructor (
             val result = repository.searchProductsFromApi(keyword)
 
             result.onSuccess { searchedList ->
-                // Tìm thành công -> Bơm danh sách mới vào biến _products cũ
-                // MainActivity đang lắng nghe _products sẽ tự động cập nhật UI!
                 _products.postValue(searchedList)
                 _errorMessage.postValue(null)
             }.onFailure { exception ->
@@ -115,6 +114,13 @@ class HomeViewModel @Inject constructor (
     fun toggleFavorite(productId: Int, isFavorite: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.toggleFavorite(productId, isFavorite)
+            loadFavoriteIds()
+        }
+    }
+    fun loadFavoriteIds() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val ids = repository.getAllFavoriteIds().toSet()
+            _favoriteIds.postValue(ids)
         }
     }
 }

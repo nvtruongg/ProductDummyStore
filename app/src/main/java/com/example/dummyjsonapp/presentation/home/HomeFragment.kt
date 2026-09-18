@@ -90,7 +90,6 @@ class HomeFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        // CHÚ Ý: Dùng viewLifecycleOwner thay vì this trong Fragment
         viewModel.products.observe(viewLifecycleOwner) { productList ->
             if (productList != null) {
                 adapter.submitList(productList)

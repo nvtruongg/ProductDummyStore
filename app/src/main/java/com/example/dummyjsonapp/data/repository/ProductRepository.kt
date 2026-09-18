@@ -102,7 +102,7 @@ class ProductRepository @Inject constructor(
     }
     suspend fun getFavoritedProducts(): Result<List<ProductEntity>> {
         return try {
-            val favorites = productDao.getFavoritedProducts()
+            val favorites = productDao.getFavoriteProducts()
             Result.success(favorites)
         } catch (e: Exception) {
             Result.failure(Exception("Không thể tải danh sách yêu thích!"))

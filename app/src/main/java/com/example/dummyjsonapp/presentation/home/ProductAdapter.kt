@@ -59,7 +59,6 @@ class ProductAdapter(private val onItemClick: (ProductEntity) -> Unit,
             }
 
             val isFavorited = favoriteProductIds.contains(product.id)
-            // Đổi icon tương ứng
             if (isFavorited) {
                 binding.ivFavorite.setImageResource(R.drawable.ic_favorite_filled)
             } else {
@@ -72,7 +71,6 @@ class ProductAdapter(private val onItemClick: (ProductEntity) -> Unit,
                 onFavoriteClick(product, !isFavorited)
             }
 
-            // (Giữ nguyên sự kiện click vào toàn bộ item để vào trang Detail)
             binding.root.setOnClickListener { onItemClick(product) }
         }
     }
