@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.dummyjsonapp.data.local.entity.ProductEntity
+import com.example.dummyjsonapp.domain.model.ProductModel
 import com.example.dummyjsonapp.domain.repository.ProductRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -15,8 +15,8 @@ import javax.inject.Inject
 class ProductDetailViewModel @Inject constructor(
     private val repository: ProductRepository
 ): ViewModel() {
-    private val _selectedProduct = MutableLiveData<ProductEntity?>()
-    val selectedProduct: LiveData<ProductEntity?> = _selectedProduct
+    private val _selectedProduct = MutableLiveData<ProductModel?>()
+    val selectedProduct: LiveData<ProductModel?> = _selectedProduct
 
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> = _errorMessage

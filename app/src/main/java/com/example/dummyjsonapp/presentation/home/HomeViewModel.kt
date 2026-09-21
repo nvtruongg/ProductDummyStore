@@ -4,8 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.dummyjsonapp.data.local.entity.ProductEntity
-import com.example.dummyjsonapp.data.remote.dto.Category
+import com.example.dummyjsonapp.data.remote.dto.CategoryDto
+import com.example.dummyjsonapp.domain.model.ProductModel
 import com.example.dummyjsonapp.domain.repository.ProductRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -16,10 +16,10 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor (
     private val repository: ProductRepository
 ) : ViewModel() {
-    private val _products = MutableLiveData<List<ProductEntity>>()
-    val products: LiveData<List<ProductEntity>> = _products
-    private val _categories = MutableLiveData<List<Category>>()
-    val categories: LiveData<List<Category>> = _categories
+    private val _products = MutableLiveData<List<ProductModel>>()
+    val products: LiveData<List<ProductModel>> = _products
+    private val _categories = MutableLiveData<List<CategoryDto>>()
+    val categories: LiveData<List<CategoryDto>> = _categories
 
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
@@ -58,9 +58,9 @@ class HomeViewModel @Inject constructor (
     }
     fun loadCategories() {
         viewModelScope.launch(Dispatchers.IO) {
-            val result = repository.getCategoriesFromApi()
+            val result = repository.getCategories()
             result.onSuccess { categoryList ->
-                val categoryAll = Category(slug = "", name = "Tất cả", url = "")
+                val categoryAll = CategoryDto(slug = "", name = "Tất cả", url = "")
                 val displayList = listOf(categoryAll) + categoryList
                 _categories.postValue(displayList)
             }.onFailure {
@@ -72,7 +72,7 @@ class HomeViewModel @Inject constructor (
         viewModelScope.launch(Dispatchers.IO) {
             _isLoading.postValue(true) // Bật loading
 
-            val result = repository.searchProductsFromApi(keyword)
+            val result = repository.searchProducts(keyword)
 
             result.onSuccess { searchedList ->
                 _products.postValue(searchedList)
@@ -92,7 +92,7 @@ class HomeViewModel @Inject constructor (
         viewModelScope.launch(Dispatchers.IO) {
             _isLoading.postValue(true)
 
-            val result = repository.getProductsByCategoryFromApi(slug)
+            val result = repository.getProductsByCategory(slug)
             result.onSuccess { filteredList ->
                 _products.postValue(filteredList)
                 _errorMessage.postValue(null)

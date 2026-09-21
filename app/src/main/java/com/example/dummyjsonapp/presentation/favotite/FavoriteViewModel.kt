@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.dummyjsonapp.data.local.entity.ProductEntity
+import com.example.dummyjsonapp.domain.model.ProductModel
 import com.example.dummyjsonapp.domain.repository.ProductRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -18,8 +18,8 @@ class FavoriteViewModel @Inject constructor(
     private val _favoriteIds = MutableLiveData<Set<Int>>(emptySet())
     val favoriteIds: LiveData<Set<Int>> = _favoriteIds
 
-    private val _favoriteProductsList = MutableLiveData<List<ProductEntity>>()
-    val favoriteProductsList: LiveData<List<ProductEntity>> = _favoriteProductsList
+    private val _favoriteProductsList = MutableLiveData<List<ProductModel>>()
+    val favoriteProductsList: LiveData<List<ProductModel>> = _favoriteProductsList
 
     init {
         loadFavoriteIds()

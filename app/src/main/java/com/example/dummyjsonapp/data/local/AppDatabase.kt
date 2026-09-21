@@ -10,7 +10,13 @@ import com.example.dummyjsonapp.data.local.entity.CartEntity
 import com.example.dummyjsonapp.data.local.entity.FavoriteEntity
 import com.example.dummyjsonapp.data.local.entity.ProductEntity
 
-@Database(entities = [ProductEntity::class, FavoriteEntity::class, CartEntity::class], version = 4, exportSchema = false)
+@Database(
+    entities =
+        [ProductEntity::class,
+        FavoriteEntity::class,
+        CartEntity::class],
+    version = 4,
+    exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun productDao() : ProductDao

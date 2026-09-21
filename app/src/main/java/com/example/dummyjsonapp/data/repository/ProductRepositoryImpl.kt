@@ -4,26 +4,28 @@ import com.example.dummyjsonapp.data.remote.ApiService
 import com.example.dummyjsonapp.data.local.dao.ProductDao
 import com.example.dummyjsonapp.data.local.entity.CartEntity
 import com.example.dummyjsonapp.data.local.entity.CartItem
-import com.example.dummyjsonapp.data.remote.dto.Category
+import com.example.dummyjsonapp.data.remote.dto.CategoryDto
 import com.example.dummyjsonapp.data.local.entity.FavoriteEntity
-import com.example.dummyjsonapp.data.local.entity.ProductEntity
+import com.example.dummyjsonapp.data.mapper.toEntity
+import com.example.dummyjsonapp.data.mapper.toDomain
 import com.example.dummyjsonapp.domain.repository.ProductRepository
+import com.example.dummyjsonapp.domain.model.ProductModel
 import javax.inject.Inject
 
 class ProductRepositoryImpl @Inject constructor(
     private val apiService: ApiService,
     private val productDao : ProductDao
 ): ProductRepository {
-    //lấy dữu liệu từ room
-    override suspend fun getProductsFromLocal(): List<ProductEntity>{
-        return productDao.getAllProducts()
+
+    override suspend fun getProductsFromLocal(): List<ProductModel>{
+        return productDao.getAllProducts().map{it.toDomain()}
     }
-    //lấy dữ lieeuj từ api và lưu vào room
+
     override suspend fun refreshProducts(): Result<Unit> {
         return try {
             val response = apiService.getProducts()
             if (response.isSuccessful && response.body() != null) {
-                val products = response.body()!!.products
+                val products = response.body()!!.products.map {it.toEntity()}
                 productDao.insertProducts(products)
                 Result.success(Unit)
             } else {
@@ -33,31 +35,34 @@ class ProductRepositoryImpl @Inject constructor(
             Result.failure(e)
         }
     }
-    override suspend fun getProductById(id: Int): ProductEntity? {
-        return productDao.getProductById(id)
+
+    override suspend fun getProductById(id: Int): ProductModel? {
+        return productDao.getProductById(id)?.toDomain()
     }
-    // Nối với API Tìm kiếm
-    override suspend fun searchProductsFromApi(keyword: String): Result<List<ProductEntity>> {
+
+    override suspend fun searchProducts(keyword: String): Result<List<ProductModel>> {
         return try {
             val response = apiService.searchProducts(keyword)
             if (response.isSuccessful && response.body() != null) {
-                Result.success(response.body()!!.products)
+                val entities = response.body()!!.products.map { it.toEntity() }
+                productDao.insertProducts(entities)
+                Result.success(entities.map { it.toDomain() })
             } else {
                 val localData = productDao.searchProducts(keyword)
-                if (localData.isNotEmpty()) Result.success(localData)
+                if (localData.isNotEmpty()) Result.success(localData.map { it.toDomain() })
                 else Result.failure(Exception("Không tìm thấy kết quả!"))
             }
         } catch (e: Exception) {
             val localData = productDao.searchProducts(keyword)
             if (localData.isNotEmpty()) {
-                Result.success(localData)
+                Result.success(localData.map { it.toDomain() })
             } else {
                 Result.failure(Exception("Bạn đang offline!"))
             }
         }
     }
-    // Nối với API Danh mục
-    override suspend fun getCategoriesFromApi(): Result<List<Category>> {
+
+    override suspend fun getCategories(): Result<List<CategoryDto>> {
         return try {
             val response = apiService.getCategories()
             if(response.isSuccessful && response.body() != null){
@@ -70,21 +75,23 @@ class ProductRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getProductsByCategoryFromApi(categorySlug: String): Result<List<ProductEntity>> {
+    override suspend fun getProductsByCategory(categorySlug: String): Result<List<ProductModel>> {
         return try {
             val response = apiService.getProductsByCategory(categorySlug)
 
             if (response.isSuccessful && response.body() != null) {
-                Result.success(response.body()!!.products)
+                val entities = response.body()!!.products.map { it.toEntity() }
+                productDao.insertProducts(entities)
+                Result.success(entities.map { it.toDomain() })
             } else {
                 val localData = productDao.getProductsByCategory(categorySlug)
-                if (localData.isNotEmpty()) Result.success(localData)
+                if (localData.isNotEmpty()) Result.success(localData.map { it.toDomain() })
                 else Result.failure(Exception("Lỗi máy chủ và không có dữ liệu cũ!"))
             }
         } catch (e: Exception) {
             val localData = productDao.getProductsByCategory(categorySlug)
             if (localData.isNotEmpty()) {
-                Result.success(localData)
+                Result.success(localData.map { it.toDomain() })
             } else {
                 Result.failure(Exception("Bạn đang offline!"))
             }
@@ -101,9 +108,9 @@ class ProductRepositoryImpl @Inject constructor(
     override suspend fun getAllFavoriteIds(): List<Int> {
         return productDao.getAllFavoriteIds()
     }
-    override suspend fun getFavoriteProducts(): Result<List<ProductEntity>> {
+    override suspend fun getFavoriteProducts(): Result<List<ProductModel>> {
         return try {
-            val favorites = productDao.getFavoriteProducts()
+            val favorites = productDao.getFavoriteProducts().map { it.toDomain() }
             Result.success(favorites)
         } catch (e: Exception) {
             Result.failure(Exception("Không thể tải danh sách yêu thích!"))

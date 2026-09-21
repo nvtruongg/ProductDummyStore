@@ -8,12 +8,13 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.dummyjsonapp.R
-import com.example.dummyjsonapp.data.local.entity.ProductEntity
 import com.example.dummyjsonapp.databinding.ItemProductBinding
+import com.example.dummyjsonapp.domain.model.ProductModel
+import kotlin.math.roundToInt
 
-class ProductAdapter(private val onItemClick: (ProductEntity) -> Unit,
-                     private val onFavoriteClick: (ProductEntity, Boolean) -> Unit) :
-    ListAdapter<ProductEntity, ProductAdapter.ProductViewHolder>(ProductDiffCallback()) {
+class ProductAdapter(private val onItemClick: (ProductModel) -> Unit,
+                     private val onFavoriteClick: (ProductModel, Boolean) -> Unit) :
+    ListAdapter<ProductModel, ProductAdapter.ProductViewHolder>(ProductDiffCallback()) {
 
     private var favoriteProductIds: Set<Int> = emptySet()
     fun updateFavorites(newFavorites: Set<Int>) {
@@ -33,13 +34,13 @@ class ProductAdapter(private val onItemClick: (ProductEntity) -> Unit,
     }
 
     inner class ProductViewHolder(private val binding: ItemProductBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(product: ProductEntity) {
+        fun bind(product: ProductModel) {
             binding.tvTitle.text = product.title
             binding.tvPrice.text = "$${product.price}"
             binding.tvRating.text = "⭐ ${product.rating}"
 
             if (product.discountPercentage >= 1.0) {
-                val discount = product.discountPercentage
+                val discount = product.discountPercentage.roundToInt()
                 binding.tvDiscount.text = "-$discount%"
                 binding.tvDiscount.visibility = View.VISIBLE
             } else {
@@ -65,18 +66,16 @@ class ProductAdapter(private val onItemClick: (ProductEntity) -> Unit,
             binding.ivFavorite.setOnClickListener {
                 onFavoriteClick(product, !isFavorited)
             }
-
-            binding.root.setOnClickListener { onItemClick(product) }
         }
     }
 
     // Bộ lọc DiffUtil
-    class ProductDiffCallback : DiffUtil.ItemCallback<ProductEntity>() {
-        override fun areItemsTheSame(oldItem: ProductEntity, newItem: ProductEntity): Boolean {
+    class ProductDiffCallback : DiffUtil.ItemCallback<ProductModel>() {
+        override fun areItemsTheSame(oldItem: ProductModel, newItem: ProductModel): Boolean {
             return oldItem.id == newItem.id
         }
 
-        override fun areContentsTheSame(oldItem: ProductEntity, newItem: ProductEntity): Boolean {
+        override fun areContentsTheSame(oldItem: ProductModel, newItem: ProductModel): Boolean {
             return oldItem == newItem
         }
     }

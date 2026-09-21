@@ -1,6 +1,6 @@
 package com.example.dummyjsonapp.data.remote
 
-import com.example.dummyjsonapp.data.remote.dto.Category
+import com.example.dummyjsonapp.data.remote.dto.CategoryDto
 import com.example.dummyjsonapp.data.remote.dto.ProductResponse
 import retrofit2.Response
 import retrofit2.http.GET
@@ -13,7 +13,7 @@ interface ApiService {
     @GET("products/search")
     suspend fun searchProducts(@Query("q") query: String): Response<ProductResponse>
     @GET("products/categories")
-    suspend fun getCategories() : Response<List<Category>>
+    suspend fun getCategories() : Response<List<CategoryDto>>
     @GET("products/category/{category_slug}")
     suspend fun getProductsByCategory(@Path("category_slug") categorySlug: String): Response<ProductResponse>
 }
