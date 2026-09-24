@@ -12,7 +12,9 @@ import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dummyjsonapp.databinding.FragmentHomeBinding
@@ -40,6 +42,7 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val categoryAdapter = CategoryAdapter(emptyList()) { clickedCategory ->
+            binding.recyclerView.scrollToPosition(0)
             viewModel.filterByCategory(clickedCategory.slug)
         }
         binding.rvCategories.layoutManager =
@@ -56,6 +59,7 @@ class HomeFragment : Fragment() {
                 } else {
                     viewModel.loadData()
                 }
+                binding.recyclerView.scrollToPosition(0)
             }
         }
 
@@ -82,41 +86,38 @@ class HomeFragment : Fragment() {
         binding.recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
         binding.recyclerView.adapter = adapter
 
-        observeViewModel()
+        observeUiState()
     }
 
-    private fun observeViewModel() {
-        viewModel.products.observe(viewLifecycleOwner) { productList ->
-            if (productList != null) {
-                adapter.submitList(productList)
-                if (productList.isEmpty()) {
-                    binding.recyclerView.visibility = View.GONE
-                    binding.tvEmptyMessage.visibility = View.VISIBLE
-                } else {
-                    binding.recyclerView.visibility = View.VISIBLE
-                    binding.tvEmptyMessage.visibility = View.GONE
+    private fun observeUiState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { state ->
+
+                    binding.progressBar.visibility = if (state.isLoading) View.VISIBLE else View.GONE
+
+                    adapter.submitList(state.products) {
+                        if (state.products.isNotEmpty()) {
+                            binding.recyclerView.scrollToPosition(0)
+                        }
+                    }
+
+                    if (!state.isLoading && state.products.isEmpty()) {
+                        binding.recyclerView.visibility = View.GONE
+                        binding.tvEmptyMessage.visibility = View.VISIBLE
+                    } else {
+                        binding.recyclerView.visibility = View.VISIBLE
+                        binding.tvEmptyMessage.visibility = View.GONE
+                    }
+
+                    (binding.rvCategories.adapter as? CategoryAdapter)?.updateData(state.categories)
+
+                    state.errorMessage?.let{message ->
+                        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                        viewModel.clearError()
+                    }
                 }
             }
-        }
-
-        viewModel.categories.observe(viewLifecycleOwner) { categoryList ->
-            if (categoryList != null) {
-                (binding.rvCategories.adapter as? CategoryAdapter)?.updateData(categoryList)
-            }
-        }
-
-        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-            binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
-        }
-
-        viewModel.errorMessage.observe(viewLifecycleOwner) { message ->
-            if (message != null) {
-                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        viewModel.favoriteIds.observe(viewLifecycleOwner) { favoriteIds ->
-            adapter.updateFavorites(favoriteIds)
         }
     }
 

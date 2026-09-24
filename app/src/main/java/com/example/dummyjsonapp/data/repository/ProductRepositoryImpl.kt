@@ -3,13 +3,20 @@ package com.example.dummyjsonapp.data.repository
 import com.example.dummyjsonapp.data.remote.ApiService
 import com.example.dummyjsonapp.data.local.dao.ProductDao
 import com.example.dummyjsonapp.data.local.entity.CartEntity
-import com.example.dummyjsonapp.data.local.entity.CartItem
-import com.example.dummyjsonapp.data.remote.dto.CategoryDto
 import com.example.dummyjsonapp.data.local.entity.FavoriteEntity
 import com.example.dummyjsonapp.data.mapper.toEntity
 import com.example.dummyjsonapp.data.mapper.toDomain
+import com.example.dummyjsonapp.domain.model.CartItemModel
+import com.example.dummyjsonapp.domain.model.CategoryModel
 import com.example.dummyjsonapp.domain.repository.ProductRepository
 import com.example.dummyjsonapp.domain.model.ProductModel
+import com.example.dummyjsonapp.domain.result.Resource
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class ProductRepositoryImpl @Inject constructor(
@@ -17,86 +24,130 @@ class ProductRepositoryImpl @Inject constructor(
     private val productDao : ProductDao
 ): ProductRepository {
 
-    override suspend fun getProductsFromLocal(): List<ProductModel>{
-        return productDao.getAllProducts().map{it.toDomain()}
-    }
+    override fun getProducts(): Flow<Resource<List<ProductModel>>> = flow{
 
-    override suspend fun refreshProducts(): Result<Unit> {
-        return try {
-            val response = apiService.getProducts()
-            if (response.isSuccessful && response.body() != null) {
-                val products = response.body()!!.products.map {it.toEntity()}
-                productDao.insertProducts(products)
-                Result.success(Unit)
-            } else {
-                Result.failure(Exception("Lỗi API: ${response.code()}"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
+        emit(Resource.Loading)
+        val localProducts = productDao.getAllProducts().map { it.toDomain() }
+
+        if(localProducts.isNotEmpty()){
+            emit(Resource.Success(localProducts))
         }
-    }
+        try {
+            val response = apiService.getProducts()
+
+            if(response.isSuccessful && response.body() != null){
+                val netProducts = response.body()!!.products.map { it.toEntity() }
+                productDao.insertProducts(netProducts)
+
+                val newProducts = productDao.getAllProducts().map { it.toDomain() }
+                emit(Resource.Success(newProducts))
+
+            }else{
+                throw Exception("Lỗi API: ${response.code()}")
+            }
+        }catch (e: CancellationException){
+            throw e
+
+        }catch (e: Exception){
+            if(localProducts.isEmpty()){
+                emit(Resource.Error(e.message ?: "Không thể tải dữ liệu!"))
+            }else{
+                emit(Resource.Success(localProducts))
+            }
+        }
+    }.flowOn(Dispatchers.IO)
 
     override suspend fun getProductById(id: Int): ProductModel? {
         return productDao.getProductById(id)?.toDomain()
     }
 
-    override suspend fun searchProducts(keyword: String): Result<List<ProductModel>> {
-        return try {
+    override fun searchProducts(keyword: String): Flow<Resource<List<ProductModel>>> = flow {
+        emit(Resource.Loading)
+
+        val localData = productDao.searchProducts(keyword).map { it.toDomain() }
+        if (localData.isNotEmpty()) {
+            emit(Resource.Success(localData))
+        }
+
+        try {
             val response = apiService.searchProducts(keyword)
             if (response.isSuccessful && response.body() != null) {
                 val entities = response.body()!!.products.map { it.toEntity() }
                 productDao.insertProducts(entities)
-                Result.success(entities.map { it.toDomain() })
+
+                val newData = productDao.searchProducts(keyword).map { it.toDomain() }
+                emit(Resource.Success(newData))
             } else {
-                val localData = productDao.searchProducts(keyword)
-                if (localData.isNotEmpty()) Result.success(localData.map { it.toDomain() })
-                else Result.failure(Exception("Không tìm thấy kết quả!"))
+                throw Exception("Lỗi API: ${response.code()}")
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
-            val localData = productDao.searchProducts(keyword)
-            if (localData.isNotEmpty()) {
-                Result.success(localData.map { it.toDomain() })
+            if (localData.isEmpty()) {
+                emit(Resource.Error("Bạn đang offline và không có dữ liệu cũ!"))
             } else {
-                Result.failure(Exception("Bạn đang offline!"))
+                emit(Resource.Success(localData))
             }
         }
-    }
+    }.flowOn(Dispatchers.IO)
 
-    override suspend fun getCategories(): Result<List<CategoryDto>> {
-        return try {
+    override fun getCategories(): Flow<Resource<List<CategoryModel>>> = flow{
+        val localCategories = productDao.getAllCategories().map { it.toDomain() }
+        if (localCategories.isNotEmpty()) {
+            emit(Resource.Success(localCategories))
+        }
+        try {
             val response = apiService.getCategories()
-            if(response.isSuccessful && response.body() != null){
-                Result.success(response.body()!!)
+            if (response.isSuccessful && response.body() != null) {
+                val netCategories = response.body()!!.map { it.toEntity() }
+                productDao.insertCategories(netCategories)
+
+                val newCategories = productDao.getAllCategories().map { it.toDomain() }
+                emit(Resource.Success(newCategories))
             } else {
-                Result.failure(Exception("Lỗi API: ${response.code()}"))
+                throw Exception("Lỗi API: ${response.code()}")
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
-            Result.failure(e)
+            if (localCategories.isEmpty()) {
+                emit(Resource.Error(e.message ?: "Không thể tải danh mục!"))
+            } else {
+                emit(Resource.Success(localCategories))
+            }
         }
-    }
+    }.flowOn(Dispatchers.IO)
 
-    override suspend fun getProductsByCategory(categorySlug: String): Result<List<ProductModel>> {
-        return try {
+    override fun getProductsByCategory(categorySlug: String): Flow<Resource<List<ProductModel>>> = flow {
+        emit(Resource.Loading)
+
+        val localData = productDao.getProductsByCategory(categorySlug).map { it.toDomain() }
+        if (localData.isNotEmpty()) {
+            emit(Resource.Success(localData))
+        }
+
+        try {
             val response = apiService.getProductsByCategory(categorySlug)
-
             if (response.isSuccessful && response.body() != null) {
                 val entities = response.body()!!.products.map { it.toEntity() }
                 productDao.insertProducts(entities)
-                Result.success(entities.map { it.toDomain() })
+
+                val newData = productDao.getProductsByCategory(categorySlug).map { it.toDomain() }
+                emit(Resource.Success(newData))
             } else {
-                val localData = productDao.getProductsByCategory(categorySlug)
-                if (localData.isNotEmpty()) Result.success(localData.map { it.toDomain() })
-                else Result.failure(Exception("Lỗi máy chủ và không có dữ liệu cũ!"))
+                throw Exception("Lỗi API: ${response.code()}")
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
-            val localData = productDao.getProductsByCategory(categorySlug)
-            if (localData.isNotEmpty()) {
-                Result.success(localData.map { it.toDomain() })
+            if (localData.isEmpty()) {
+                emit(Resource.Error("Bạn đang offline!"))
             } else {
-                Result.failure(Exception("Bạn đang offline!"))
+                emit(Resource.Success(localData))
             }
         }
-    }
+    }.flowOn(Dispatchers.IO)
+
     override suspend fun toggleFavorite(productId: Int, isFavorite: Boolean) {
         if (isFavorite) {
             productDao.insertFavorite(FavoriteEntity(productId))
@@ -108,14 +159,17 @@ class ProductRepositoryImpl @Inject constructor(
     override suspend fun getAllFavoriteIds(): List<Int> {
         return productDao.getAllFavoriteIds()
     }
-    override suspend fun getFavoriteProducts(): Result<List<ProductModel>> {
-        return try {
-            val favorites = productDao.getFavoriteProducts().map { it.toDomain() }
-            Result.success(favorites)
+    override fun getFavoriteProducts(): Flow<Resource<List<ProductModel>>> = flow {
+        emit(Resource.Loading)
+        try {
+            val favorites = productDao.getFavoriteProducts().map { it.toDomain().copy(isFavorite = true) }
+            if (favorites.isNotEmpty()) {
+                emit(Resource.Success(favorites))
+            }
         } catch (e: Exception) {
-            Result.failure(Exception("Không thể tải danh sách yêu thích!"))
+            emit(Resource.Error(e.message ?: "Không thể tải danh sách yêu thích!"))
         }
-    }
+    }.flowOn(Dispatchers.IO)
 
     override suspend fun addToCart(productId: Int) : Boolean {
         val product = productDao.getProductById(productId) ?: return false
@@ -134,8 +188,8 @@ class ProductRepositoryImpl @Inject constructor(
         return true
     }
 
-    override suspend fun getCartItems(): List<CartItem> {
-        return productDao.getCartItems()
+    override suspend fun getCartItems(): List<CartItemModel> {
+        return productDao.getCartItems().map { it.toDomain() }
     }
 
     override suspend fun updateCartQuantity(productId: Int, quantity: Int): Boolean {

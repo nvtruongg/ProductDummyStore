@@ -1,11 +1,14 @@
 package com.example.dummyjsonapp.data.mapper
 
+import com.example.dummyjsonapp.data.local.entity.CategoryEntity
 import com.example.dummyjsonapp.data.local.entity.ProductDimensions
 import com.example.dummyjsonapp.data.local.entity.ProductEntity
 import com.example.dummyjsonapp.data.local.entity.ProductReview
+import com.example.dummyjsonapp.data.remote.dto.CategoryDto
 import com.example.dummyjsonapp.data.remote.dto.ProductDimensionsDto
 import com.example.dummyjsonapp.data.remote.dto.ProductDto
 import com.example.dummyjsonapp.data.remote.dto.ProductReviewDto
+import com.example.dummyjsonapp.domain.model.CategoryModel
 import com.example.dummyjsonapp.domain.model.ProductDimensionsModel
 import com.example.dummyjsonapp.domain.model.ProductModel
 import com.example.dummyjsonapp.domain.model.ProductReviewModel
@@ -88,5 +91,21 @@ fun ProductReview.toDomain(): ProductReviewModel {
         date = date,
         reviewerName = reviewerName,
         reviewerEmail = reviewerEmail
+    )
+}
+
+fun CategoryDto.toEntity(): CategoryEntity {
+    return CategoryEntity(
+        slug = slug,
+        name = name,
+        url = url
+    )
+}
+
+fun CategoryEntity.toDomain(): CategoryModel {
+    return CategoryModel(
+        slug = slug,
+        name = name,
+        url = url
     )
 }

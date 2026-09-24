@@ -1,14 +1,19 @@
 package com.example.dummyjsonapp.presentation.home
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.dummyjsonapp.data.remote.dto.CategoryDto
+import com.example.dummyjsonapp.domain.model.CategoryModel
 import com.example.dummyjsonapp.domain.model.ProductModel
 import com.example.dummyjsonapp.domain.repository.ProductRepository
+import com.example.dummyjsonapp.domain.result.Resource
+import com.example.dummyjsonapp.presentation.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -16,92 +21,118 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor (
     private val repository: ProductRepository
 ) : ViewModel() {
-    private val _products = MutableLiveData<List<ProductModel>>()
-    val products: LiveData<List<ProductModel>> = _products
-    private val _categories = MutableLiveData<List<CategoryDto>>()
-    val categories: LiveData<List<CategoryDto>> = _categories
 
-    private val _isLoading = MutableLiveData<Boolean>()
-    val isLoading: LiveData<Boolean> = _isLoading
+    private val _uiState = MutableStateFlow(UiState())
+    val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
-    private val _errorMessage = MutableLiveData<String?>()
-    val errorMessage: LiveData<String?> = _errorMessage
-
-    private val _favoriteIds = MutableLiveData<Set<Int>>(emptySet())
-    val favoriteIds: LiveData<Set<Int>> = _favoriteIds
+    private var rawProducts : List<ProductModel> = emptyList()
+    private var productJob: Job? = null
 
     init {
         loadData()
         loadCategories()
         loadFavoriteIds()
     }
+    private fun updateProductsFavorite() {
+        val currentFavorites = _uiState.value.favoriteIds
+
+        val newProductsFav = rawProducts.map { product ->
+            product.copy(isFavorite = currentFavorites.contains(product.id))
+        }
+
+        _uiState.update { it.copy(products = newProductsFav) }
+    }
     fun loadData() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _isLoading.postValue(true)
+        productJob?.cancel()
+        productJob = viewModelScope.launch {
+            repository.getProducts().collect { resource ->
+                when (resource) {
 
-            val localData = repository.getProductsFromLocal()
-            _products.postValue(localData)
+                    Resource.Loading -> {
+                        _uiState.update {
+                            it.copy(isLoading = true)
+                        }
+                    }
 
-            val refreshResult = repository.refreshProducts()
-            refreshResult.onSuccess {
-                val updatedData = repository.getProductsFromLocal()
-                _products.postValue(updatedData)
-                _errorMessage.postValue(null)
-            }.onFailure { exception ->
-                if (localData.isEmpty()) {
-                    _errorMessage.postValue("Không thể tải dữ liệu: ${exception.message}")
+                    is Resource.Success -> {
+                        _uiState.update { it.copy(isLoading = false, errorMessage = null) }
+                        rawProducts = resource.data
+                        updateProductsFavorite()
+                    }
+
+                    is Resource.Error -> {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                errorMessage = resource.message
+                            )
+                        }
+                    }
                 }
             }
-
-            _isLoading.postValue(false)
         }
     }
     fun loadCategories() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val result = repository.getCategories()
-            result.onSuccess { categoryList ->
-                val categoryAll = CategoryDto(slug = "", name = "Tất cả", url = "")
-                val displayList = listOf(categoryAll) + categoryList
-                _categories.postValue(displayList)
-            }.onFailure {
-                _categories.postValue(emptyList())
+        viewModelScope.launch {
+            repository.getCategories().collect { resource->
+                when(resource){
+                    is Resource.Success -> {
+                        val categoryAll = CategoryModel(slug = "", name = "Tất cả", url = "")
+                        val displayList = listOf(categoryAll) + resource.data
+                        _uiState.update { it.copy(categories = displayList) }
+                    }
+                    is Resource.Error -> {
+                        _uiState.update { it.copy(errorMessage = resource.message) }
+                    }
+                    is Resource.Loading -> {}
+                }
             }
+
+
         }
     }
     fun searchProducts(keyword: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _isLoading.postValue(true) // Bật loading
-
-            val result = repository.searchProducts(keyword)
-
-            result.onSuccess { searchedList ->
-                _products.postValue(searchedList)
-                _errorMessage.postValue(null)
-            }.onFailure { exception ->
-                _errorMessage.postValue("Lỗi tìm kiếm: ${exception.message}")
+        productJob?.cancel()
+        productJob = viewModelScope.launch {
+            repository.searchProducts(keyword).collect { resource ->
+                when(resource){
+                    is Resource.Success -> {
+                        _uiState.update { it.copy(isLoading = false)}
+                        rawProducts = resource.data
+                        updateProductsFavorite()
+                    }
+                    is Resource.Error -> {
+                        _uiState.update { it.copy(isLoading = false, errorMessage = resource.message) }
+                    }
+                    is Resource.Loading -> {
+                        _uiState.update { it.copy(isLoading = true) }
+                    }
+                }
             }
-
-            _isLoading.postValue(false) // Tắt loading
         }
     }
     fun filterByCategory(slug: String) {
+        productJob?.cancel()
         if (slug.isEmpty()) {
             loadData()
             return
         }
-        viewModelScope.launch(Dispatchers.IO) {
-            _isLoading.postValue(true)
-
-            val result = repository.getProductsByCategory(slug)
-            result.onSuccess { filteredList ->
-                _products.postValue(filteredList)
-                _errorMessage.postValue(null)
-            }.onFailure { exception ->
-                _products.postValue(emptyList())
-                _errorMessage.postValue("Lỗi: ${exception.message}")
+        productJob = viewModelScope.launch {
+            repository.getProductsByCategory(slug).collect { resource ->
+                when(resource){
+                    is Resource.Success -> {
+                        _uiState.update { it.copy(isLoading = false) }
+                        rawProducts = resource.data
+                        updateProductsFavorite()
+                    }
+                    is Resource.Error -> {
+                        _uiState.update { it.copy(isLoading = false, errorMessage = resource.message) }
+                    }
+                    is Resource.Loading -> {
+                        _uiState.update { it.copy(isLoading = true) }
+                    }
+                }
             }
-
-            _isLoading.postValue(false)
         }
     }
     fun toggleFavorite(productId: Int, isFavorite: Boolean) {
@@ -113,7 +144,11 @@ class HomeViewModel @Inject constructor (
     fun loadFavoriteIds() {
         viewModelScope.launch(Dispatchers.IO) {
             val ids = repository.getAllFavoriteIds().toSet()
-            _favoriteIds.postValue(ids)
+            _uiState.update { it.copy(favoriteIds = ids) }
+            updateProductsFavorite()
         }
+    }
+    fun clearError() {
+        _uiState.update { it.copy(errorMessage = null) }
     }
 }

@@ -8,29 +8,28 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.dummyjsonapp.databinding.ItemCartBinding
 import com.example.dummyjsonapp.data.local.entity.CartItem
+import com.example.dummyjsonapp.domain.model.CartItemModel
 
 class CartAdapter (
-    private val onIncreaseClick : (CartItem) -> Unit,
-    private val onDecreaseClick : (CartItem) -> Unit,
-    private val onDeleteClick : (CartItem) -> Unit,
-    private val onItemClick : (CartItem) -> Unit
-): ListAdapter<CartItem, CartAdapter.CartViewHolder>(CartDiffCallback) {
+    private val onIncreaseClick : (CartItemModel) -> Unit,
+    private val onDecreaseClick : (CartItemModel) -> Unit,
+    private val onDeleteClick : (CartItemModel) -> Unit,
+    private val onItemClick : (CartItemModel) -> Unit
+): ListAdapter<CartItemModel, CartAdapter.CartViewHolder>(CartDiffCallback) {
     inner class CartViewHolder(private val binding: ItemCartBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(cartItem: CartItem) {
+        fun bind(cartItem: CartItemModel) {
             val product = cartItem.product
 
             binding.tvCartTitle.text = product.title
             binding.tvCartPrice.text = "$${product.price}"
             binding.tvQuantity.text = cartItem.quantity.toString()
 
-            // 2. Load ảnh Thumbnail (Dùng thư viện Glide, nếu bạn dùng Picasso/Coil thì thay đổi tương ứng)
             Glide.with(binding.root.context)
                 .load(product.thumbnail)
                 .into(binding.ivCartThumbnail)
 
-            // 3. Xử lý các nút bấm tăng/giảm/xóa
             binding.btnIncrease.setOnClickListener {
                 onIncreaseClick(cartItem)
             }
@@ -58,13 +57,12 @@ class CartAdapter (
     }
 }
 
-object CartDiffCallback : DiffUtil.ItemCallback<CartItem>() {
-    override fun areItemsTheSame(oldItem: CartItem, newItem: CartItem): Boolean {
+object CartDiffCallback : DiffUtil.ItemCallback<CartItemModel>() {
+    override fun areItemsTheSame(oldItem: CartItemModel, newItem: CartItemModel): Boolean {
         return oldItem.product.id == newItem.product.id
     }
 
-    override fun areContentsTheSame(oldItem: CartItem, newItem: CartItem): Boolean {
-        // Cần kiểm tra cả số lượng để UI tự động đổi số khi bấm +/-
+    override fun areContentsTheSame(oldItem: CartItemModel, newItem: CartItemModel): Boolean {
         return oldItem.product == newItem.product && oldItem.quantity == newItem.quantity
     }
 }

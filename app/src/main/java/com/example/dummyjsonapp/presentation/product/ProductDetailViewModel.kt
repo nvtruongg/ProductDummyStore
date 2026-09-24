@@ -1,13 +1,14 @@
 package com.example.dummyjsonapp.presentation.product
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.dummyjsonapp.domain.model.ProductModel
 import com.example.dummyjsonapp.domain.repository.ProductRepository
+import com.example.dummyjsonapp.presentation.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -15,27 +16,24 @@ import javax.inject.Inject
 class ProductDetailViewModel @Inject constructor(
     private val repository: ProductRepository
 ): ViewModel() {
-    private val _selectedProduct = MutableLiveData<ProductModel?>()
-    val selectedProduct: LiveData<ProductModel?> = _selectedProduct
-
-    private val _errorMessage = MutableLiveData<String?>()
-    val errorMessage: LiveData<String?> = _errorMessage
-
+    private val _uiState = MutableStateFlow(UiState())
+    val uiState : StateFlow<UiState> = _uiState.asStateFlow()
 
     fun loadProductDetail(productId: Int)  {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch() {
+            _uiState.update { it.copy(isLoading = true) }
             val product = repository.getProductById(productId)
-            _selectedProduct.postValue(product)
+            _uiState.update { it.copy(isLoading = false, product = product) }
         }
     }
     fun addToCart(productId: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch() {
             val success = repository.addToCart(productId)
-            if (success) {
-                _errorMessage.postValue("Đã thêm vào giỏ hàng!")
-            } else {
-                _errorMessage.postValue("Số lượng vượt quá tồn kho!")
-            }
+            val massage = if(success) "Đã thêm vào giỏ hàng!" else "Số lượng đã hết!"
+            _uiState.update { it.copy(errorMessage = massage) }
         }
+    }
+    fun clearMessage() {
+        _uiState.update { it.copy(errorMessage = null) }
     }
 }

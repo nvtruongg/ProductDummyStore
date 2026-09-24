@@ -1,13 +1,16 @@
 package com.example.dummyjsonapp.presentation.favotite
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.dummyjsonapp.domain.model.ProductModel
 import com.example.dummyjsonapp.domain.repository.ProductRepository
+import com.example.dummyjsonapp.domain.result.Resource
+import com.example.dummyjsonapp.presentation.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -15,34 +18,33 @@ import javax.inject.Inject
 class FavoriteViewModel @Inject constructor(
     private val repository: ProductRepository
 ): ViewModel(){
-    private val _favoriteIds = MutableLiveData<Set<Int>>(emptySet())
-    val favoriteIds: LiveData<Set<Int>> = _favoriteIds
-
-    private val _favoriteProductsList = MutableLiveData<List<ProductModel>>()
-    val favoriteProductsList: LiveData<List<ProductModel>> = _favoriteProductsList
+    private val _uiState = MutableStateFlow(UiState())
+    val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
     init {
-        loadFavoriteIds()
+        loadFavoriteProductsList()
     }
 
-    fun loadFavoriteIds() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val ids = repository.getAllFavoriteIds().toSet()
-            _favoriteIds.postValue(ids)
-        }
-    }
     fun loadFavoriteProductsList() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val result = repository.getFavoriteProducts()
-            if (result.isSuccess) {
-                _favoriteProductsList.postValue(result.getOrDefault(emptyList()))
+        viewModelScope.launch() {
+            repository.getFavoriteProducts().collect { resource ->
+                when (resource) {
+                    is Resource.Loading -> {
+                        _uiState.update { it.copy(isLoading = true) }
+                    }
+                    is Resource.Success -> {
+                        _uiState.update { it.copy(isLoading = false, products = resource.data) }
+                    }
+                    is Resource.Error -> {
+                        _uiState.update { it.copy(isLoading = false, errorMessage = resource.message) }
+                    }
+                }
             }
         }
     }
     fun toggleFavorite(productId: Int, isFavorite: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.toggleFavorite(productId, isFavorite)
-            loadFavoriteIds()
             loadFavoriteProductsList()
         }
     }

@@ -1,25 +1,25 @@
 package com.example.dummyjsonapp.domain.repository
 
-import com.example.dummyjsonapp.data.local.entity.CartItem
+import com.example.dummyjsonapp.domain.model.CartItemModel
 import com.example.dummyjsonapp.domain.model.ProductModel
-import com.example.dummyjsonapp.data.remote.dto.CategoryDto
+import com.example.dummyjsonapp.domain.model.CategoryModel
+import com.example.dummyjsonapp.domain.result.Resource
+import kotlinx.coroutines.flow.Flow
 
 interface ProductRepository {
-    suspend fun getProductsFromLocal(): List<ProductModel>
-
-    suspend fun refreshProducts(): Result<Unit>
+    fun getProducts(): Flow<Resource<List<ProductModel>>>
 
     suspend fun getProductById(id: Int): ProductModel?
 
-    suspend fun searchProducts(
+    fun searchProducts(
         keyword: String
-    ): Result<List<ProductModel>>
+    ): Flow<Resource<List<ProductModel>>>
 
-    suspend fun getCategories(): Result<List<CategoryDto>>
+    fun getCategories(): Flow<Resource<List<CategoryModel>>>
 
-    suspend fun getProductsByCategory(
+    fun getProductsByCategory(
         categorySlug: String
-    ): Result<List<ProductModel>>
+    ): Flow<Resource<List<ProductModel>>>
 
     suspend fun toggleFavorite(
         productId: Int,
@@ -28,11 +28,11 @@ interface ProductRepository {
 
     suspend fun getAllFavoriteIds(): List<Int>
 
-    suspend fun getFavoriteProducts(): Result<List<ProductModel>>
+    fun getFavoriteProducts(): Flow<Resource<List<ProductModel>>>
 
     suspend fun addToCart(productId: Int): Boolean
 
-    suspend fun getCartItems(): List<CartItem>
+    suspend fun getCartItems(): List<CartItemModel>
 
     suspend fun updateCartQuantity(
         productId: Int,

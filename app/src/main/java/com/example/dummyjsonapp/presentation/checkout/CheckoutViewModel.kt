@@ -1,25 +1,30 @@
 package com.example.dummyjsonapp.presentation.checkout
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.dummyjsonapp.data.local.entity.CartItem
+import com.example.dummyjsonapp.domain.model.CartItemModel
 import com.example.dummyjsonapp.domain.repository.ProductRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+data class CheckoutUiState(
+    val cartItems: List<CartItemModel> = emptyList(),
+    val subTotal: Double = 0.0,
+    val shippingFee: Double = 2.00,
+    val finalTotal: Double = 0.0
+)
 @HiltViewModel
 class CheckoutViewModel @Inject constructor(
     private val repository: ProductRepository
 ): ViewModel() {
-    private val _cartItems = MutableLiveData<List<CartItem>>()
-    val cartItems: LiveData<List<CartItem>> = _cartItems
-
-    private val _totalPrice = MutableLiveData<Double>()
-    val totalPrice: LiveData<Double> = _totalPrice
+    private val _uiState = MutableStateFlow(CheckoutUiState())
+    val uiState : StateFlow<CheckoutUiState> = _uiState.asStateFlow()
 
     fun placeOrder() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -29,11 +34,12 @@ class CheckoutViewModel @Inject constructor(
         }
     }
     fun loadCart() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch() {
             val items = repository.getCartItems()
-            _cartItems.postValue(items)
             val total = items.sumOf { it.product.price * it.quantity }
-            _totalPrice.postValue(total)
+            val shipfee = _uiState.value.shippingFee
+            val finalTotal = if(items.isNotEmpty()) total + shipfee else 0.0
+            _uiState.update { it.copy(cartItems = items, subTotal = total, finalTotal = finalTotal) }
         }
     }
 }

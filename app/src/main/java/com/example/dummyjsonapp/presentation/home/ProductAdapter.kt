@@ -16,18 +16,11 @@ class ProductAdapter(private val onItemClick: (ProductModel) -> Unit,
                      private val onFavoriteClick: (ProductModel, Boolean) -> Unit) :
     ListAdapter<ProductModel, ProductAdapter.ProductViewHolder>(ProductDiffCallback()) {
 
-    private var favoriteProductIds: Set<Int> = emptySet()
-    fun updateFavorites(newFavorites: Set<Int>) {
-        favoriteProductIds = newFavorites
-        notifyDataSetChanged()
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
         val binding = ItemProductBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ProductViewHolder(binding)
     }
 
-    // Đổ dữ liệu vào UI
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
         val product = getItem(position)
         holder.bind(product)
@@ -55,21 +48,19 @@ class ProductAdapter(private val onItemClick: (ProductModel) -> Unit,
                 onItemClick(product)
             }
 
-            val isFavorited = favoriteProductIds.contains(product.id)
-            if (isFavorited) {
+            if(product.isFavorite){
                 binding.ivFavorite.setImageResource(R.drawable.ic_favorite_filled)
-            } else {
+            }else{
                 binding.ivFavorite.setImageResource(R.drawable.heart)
             }
 
-            // Bắt sự kiện click vào trái tim
             binding.ivFavorite.setOnClickListener {
-                onFavoriteClick(product, !isFavorited)
+                onFavoriteClick(product, !product.isFavorite)
             }
         }
     }
 
-    // Bộ lọc DiffUtil
+    //DiffUtil
     class ProductDiffCallback : DiffUtil.ItemCallback<ProductModel>() {
         override fun areItemsTheSame(oldItem: ProductModel, newItem: ProductModel): Boolean {
             return oldItem.id == newItem.id

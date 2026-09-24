@@ -5,12 +5,12 @@ import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.dummyjsonapp.data.remote.dto.CategoryDto
 import com.example.dummyjsonapp.databinding.ItemCategoryBinding
+import com.example.dummyjsonapp.domain.model.CategoryModel
 
 class CategoryAdapter(
-    private var categories: List<CategoryDto>,
-    private val onCategoryClick: (CategoryDto) -> Unit
+    private var categories: List<CategoryModel>,
+    private val onCategoryClick: (CategoryModel) -> Unit
 ) : RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder>() {
 
     private var selectedPosition = 0
@@ -48,10 +48,9 @@ class CategoryAdapter(
         }
     }
 
-    // hàm này để MainActivity có thể bơm dữ liệu mới vào
-    fun updateData(newCategories: List<CategoryDto>) {
+    fun updateData(newCategories: List<CategoryModel>) {
         this.categories = newCategories
-        notifyDataSetChanged() // Báo cho RecyclerView vẽ lại giao diện
+        notifyDataSetChanged()
     }
 
     override fun getItemCount(): Int = categories.size

@@ -17,5 +17,6 @@ data class ProductModel (
     val warrantyInformation: String? = null,
     val shippingInformation: String? = null,
     val returnPolicy: String? = null,
-    val reviews: List<ProductReviewModel>? = null
+    val reviews: List<ProductReviewModel>? = null,
+    var isFavorite: Boolean = false
 )

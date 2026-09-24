@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.dummyjsonapp.data.local.entity.CartEntity
 import com.example.dummyjsonapp.data.local.entity.CartItem
+import com.example.dummyjsonapp.data.local.entity.CategoryEntity
 import com.example.dummyjsonapp.data.local.entity.FavoriteEntity
 import com.example.dummyjsonapp.data.local.entity.ProductEntity
 
@@ -16,6 +17,12 @@ interface ProductDao {
 
     @Query("SELECT * FROM products WHERE id = :productId")
     suspend fun getProductById(productId: Int): ProductEntity?
+
+    @Query("SELECT * FROM categories ")
+    suspend fun getAllCategories(): List<CategoryEntity>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertCategories(categories: List<CategoryEntity>)
 
     @Query("SELECT * FROM products WHERE category = :categorySlug")
     suspend fun getProductsByCategory(categorySlug: String): List<ProductEntity>
@@ -44,20 +51,15 @@ interface ProductDao {
     suspend fun getFavoriteProducts(): List<ProductEntity>
 
     // --- CÁC HÀM CHO GIỎ HÀNG (CART) ---
-
-    // Thêm hoặc cập nhật sản phẩm trong giỏ
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrUpdateCart(cartItem: CartEntity)
 
-    // Xóa một sản phẩm khỏi giỏ
     @Query("DELETE FROM cart WHERE productId = :productId")
     suspend fun removeFromCart(productId: Int)
 
-    // Lấy danh sách hiển thị Giỏ hàng (Gộp Product và Số lượng)
     @Query("SELECT products.*, cart.quantity FROM products INNER JOIN cart ON products.id = cart.productId")
     suspend fun getCartItems(): List<CartItem>
 
-    // (Tùy chọn) Xóa toàn bộ giỏ hàng sau khi thanh toán xong
     @Query("DELETE FROM cart")
     suspend fun clearCart()
 

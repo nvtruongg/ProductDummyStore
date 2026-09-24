@@ -7,8 +7,12 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.dummyjsonapp.databinding.ActivityDetailBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class DetailActivity : AppCompatActivity() {
@@ -27,17 +31,19 @@ class DetailActivity : AppCompatActivity() {
         insetsController.systemBarsBehavior =
             WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 
-        val product_id = intent.getIntExtra("product_id", -1)//từ HomeFragment
+        val product_id = intent.getIntExtra("product_id", -1)
         if(product_id != -1){
             viewModel.loadProductDetail(product_id)
         }
-
-        loadDetailProduct()
 
         binding.btnAddCart.setOnClickListener {
             if (product_id != -1) {
                 viewModel.addToCart(product_id)
             }
+        }
+
+        binding.btnBack.setOnClickListener {
+            finish()
         }
 
         binding.btnBuyNow.setOnClickListener {
@@ -48,58 +54,54 @@ class DetailActivity : AppCompatActivity() {
                 finish()
             }
         }
-        observeViewModel()
-    }
-    private fun observeViewModel(){
-        viewModel.errorMessage.observe(this) { message ->
-            if (message != null) {
-                Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-            }
-        }
+        loadDetailProduct()
     }
     private fun loadDetailProduct(){
-        viewModel.selectedProduct.observe(this){ product ->
-            if(product != null) {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { state ->
+                    state.product?.let { product ->
+                        binding.tvDetailTitle.text = "${product.brand ?: ""} ${product.title}".trim()
+                        val originalPrice = product.price / (1 - product.discountPercentage / 100)
+                        binding.tvDetailPrice.text =
+                            "$${product.price} (Giảm ${product.discountPercentage}%)"
+                        binding.tvOriginalPrice.text = "$${String.format("%.2f", originalPrice)}"
+                        binding.tvOriginalPrice.paintFlags =
+                            binding.tvOriginalPrice.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                        binding.tvDetailRating.text = "⭐ ${product.rating}/5 | Kho: ${product.stock}"
+                        binding.tvDescription.text = product.description
 
-                binding.tvDetailTitle.text = "${product.brand ?: ""} ${product.title}".trim()
-                val originalPrice = product.price / (1 - product.discountPercentage / 100)
-                binding.tvDetailPrice.text =
-                    "$${product.price} (Giảm ${product.discountPercentage}%)"
-                binding.tvOriginalPrice.text = "$${String.format("%.2f", originalPrice)}"
-                binding.tvOriginalPrice.paintFlags =
-                    binding.tvOriginalPrice.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-                binding.tvDetailRating.text = "⭐ ${product.rating}/5 | Kho: ${product.stock}"
-                binding.tvDescription.text = product.description
+                        val specsBuilder = StringBuilder()
+                        specsBuilder.append("• Thương hiệu: ${product.brand ?: "Đang cập nhật"}\n")
+                        specsBuilder.append("• Trọng lượng: ${product.weight ?: 0}g\n")
 
-                val specsBuilder = StringBuilder()
-                specsBuilder.append("• Thương hiệu: ${product.brand ?: "Đang cập nhật"}\n")
-                specsBuilder.append("• Trọng lượng: ${product.weight ?: 0}g\n")
+                        product.dimensions?.let {
+                            specsBuilder.append("• Kích thước (R-C-S): ${it.width} x ${it.height} x ${it.depth} cm\n")
+                        }
 
-                product.dimensions?.let {
-                    specsBuilder.append("• Kích thước (R-C-S): ${it.width} x ${it.height} x ${it.depth} cm\n")
-                }
+                        specsBuilder.append("• Bảo hành: ${product.warrantyInformation ?: "Không hỗ trợ"}\n")
+                        specsBuilder.append("• Đổi trả: ${product.returnPolicy ?: "Không hỗ trợ"}")
 
-                specsBuilder.append("• Bảo hành: ${product.warrantyInformation ?: "Không hỗ trợ"}\n")
-                specsBuilder.append("• Đổi trả: ${product.returnPolicy ?: "Không hỗ trợ"}")
+                        binding.tvTechnicalSpecs.text = specsBuilder.toString()
 
-                binding.tvTechnicalSpecs.text = specsBuilder.toString()
+                        if (!product.reviews.isNullOrEmpty()) {
+                            val reviewText = product.reviews.joinToString("\n\n") { rev ->
+                                "${rev.rating} ⭐ - ${rev.reviewerName}\n\"${rev.comment}\""
+                            }
+                            binding.tvReview.text = reviewText
+                        } else {
+                            binding.tvReview.text = "Chưa có đánh giá nào."
+                        }
 
-                if (!product.reviews.isNullOrEmpty()) {
-                    val reviewText = product.reviews.joinToString("\n\n") { rev ->
-                        "${rev.rating} ⭐ - ${rev.reviewerName}\n\"${rev.comment}\""
+                        if (product.images.isNotEmpty()) {
+                            val sliderAdapter = ImageSliderAdapter(product.images)
+                            binding.viewPagerImages.adapter = sliderAdapter
+                        }
                     }
-                    binding.tvReview.text = reviewText
-                } else {
-                    binding.tvReview.text = "Chưa có đánh giá nào."
-                }
-
-                if (product.images.isNotEmpty()) {
-                    val sliderAdapter = ImageSliderAdapter(product.images)
-                    binding.viewPagerImages.adapter = sliderAdapter
-                }
-
-                binding.btnBack.setOnClickListener {
-                    finish()
+                    state.errorMessage?.let { message ->
+                        Toast.makeText(this@DetailActivity, message, Toast.LENGTH_SHORT).show()
+                        viewModel.clearMessage()
+                    }
                 }
             }
         }

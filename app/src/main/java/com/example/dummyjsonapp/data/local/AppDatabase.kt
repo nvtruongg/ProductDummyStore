@@ -7,6 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.dummyjsonapp.data.local.dao.ProductDao
 import com.example.dummyjsonapp.data.local.entity.CartEntity
+import com.example.dummyjsonapp.data.local.entity.CategoryEntity
 import com.example.dummyjsonapp.data.local.entity.FavoriteEntity
 import com.example.dummyjsonapp.data.local.entity.ProductEntity
 
@@ -14,28 +15,11 @@ import com.example.dummyjsonapp.data.local.entity.ProductEntity
     entities =
         [ProductEntity::class,
         FavoriteEntity::class,
-        CartEntity::class],
-    version = 4,
+        CartEntity::class,
+        CategoryEntity::class],
+    version = 5,
     exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun productDao() : ProductDao
-
-    companion object {
-        @Volatile
-        private var INSTANCE: AppDatabase? = null
-
-        fun getDatabase(context: Context): AppDatabase {
-            return INSTANCE ?: synchronized(this) {
-                val instance = Room.databaseBuilder(
-                    context.applicationContext,
-                    AppDatabase::class.java,
-                    "product_database"
-                ).fallbackToDestructiveMigration()// xóa data cũ, tránh crash
-                    .build()
-                INSTANCE = instance
-                instance
-            }
-        }
-    }
 }

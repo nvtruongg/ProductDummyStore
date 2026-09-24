@@ -8,11 +8,15 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dummyjsonapp.databinding.FragmentCartBinding
 import com.example.dummyjsonapp.presentation.checkout.CheckoutActivity
 import com.example.dummyjsonapp.presentation.product.DetailActivity
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class CartFragment : Fragment() {
@@ -30,7 +34,6 @@ class CartFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 1. Cài đặt Adapter và xử lý các nút bấm
         adapter = CartAdapter(
             onIncreaseClick = { cartItem ->
                 viewModel.updateCartQuantity(cartItem.product.id, cartItem.quantity + 1)
@@ -50,11 +53,11 @@ class CartFragment : Fragment() {
         binding.rvCart.layoutManager = LinearLayoutManager(requireContext())
         binding.rvCart.adapter = adapter
 
-        observeViewModel()
+        observeUiState()
 
         binding.btnCheckout.setOnClickListener {
-            val currentItems = viewModel.cartItems.value
-            if (currentItems.isNullOrEmpty()) {
+            val currentItems = viewModel.uiState.value.items
+            if (currentItems.isEmpty()) {
                 Toast.makeText(requireContext(), "Giỏ hàng trống!", Toast.LENGTH_SHORT).show()
             } else {
                 val intent = Intent(requireContext(), CheckoutActivity::class.java)
@@ -62,35 +65,38 @@ class CartFragment : Fragment() {
             }
         }
     }
-        private fun observeViewModel() {
-            viewModel.cartItems.observe(viewLifecycleOwner) { items ->
-                adapter.submitList(items)
+    private fun observeUiState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { state ->
+                    adapter.submitList(state.items)
 
-                if (items.isNullOrEmpty()) {
-                    binding.rvCart.visibility = View.GONE
-                    binding.bottomCheckoutBar.visibility = View.GONE
-                    binding.layoutEmptyCart.visibility = View.VISIBLE
-                } else {
-                    binding.rvCart.visibility = View.VISIBLE
-                    binding.bottomCheckoutBar.visibility = View.VISIBLE
-                    binding.layoutEmptyCart.visibility = View.GONE
-                }
-            }
+                    if (!state.isLoading && state.items.isEmpty()) {
+                        binding.rvCart.visibility = View.GONE
+                        binding.bottomCheckoutBar.visibility = View.GONE
+                        binding.layoutEmptyCart.visibility = View.VISIBLE
+                    } else {
+                        binding.rvCart.visibility = View.VISIBLE
+                        binding.bottomCheckoutBar.visibility = View.VISIBLE
+                        binding.layoutEmptyCart.visibility = View.GONE
+                    }
 
-            viewModel.totalPrice.observe(viewLifecycleOwner) { total ->
-                binding.tvTotalPrice.text = String.format("$%.2f", total)
-            }
-            viewModel.errorMessage.observe(viewLifecycleOwner) { message ->
-                if (message != null) {
-                    Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+                    binding.tvTotalPrice.text = String.format("$%.2f", state.totalPrice)
+
+                    state.errorMessage?.let{massage->
+                        Toast.makeText(requireContext(), massage, Toast.LENGTH_SHORT).show()
+                        viewModel.clearMessage()
+                    }
                 }
             }
         }
+    }
 
-        override fun onDestroyView() {
-            super.onDestroyView()
-            _binding = null
-        }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 
     override fun onResume() {
         super.onResume()

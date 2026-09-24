@@ -7,11 +7,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.dummyjsonapp.databinding.FragmentFavoriteBinding
 import com.example.dummyjsonapp.presentation.home.ProductAdapter
 import com.example.dummyjsonapp.presentation.product.DetailActivity
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class FavoriteFragment : Fragment() {
@@ -43,25 +47,22 @@ class FavoriteFragment : Fragment() {
         binding.rvFavorites.layoutManager = GridLayoutManager(requireContext(), 2)
         binding.rvFavorites.adapter = adapter
 
-        viewModel.loadFavoriteProductsList()
-        viewModel.loadFavoriteIds()
         observeViewModel()
     }
     private fun observeViewModel() {
-        viewModel.favoriteProductsList.observe(viewLifecycleOwner) { products ->
-            adapter.submitList(products)
-
-            if (products.isNullOrEmpty()) {
-                binding.rvFavorites.visibility = View.GONE
-                binding.layoutEmpty.visibility = View.VISIBLE
-            } else {
-                binding.rvFavorites.visibility = View.VISIBLE
-                binding.layoutEmpty.visibility = View.GONE
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { state ->
+                    adapter.submitList(state.products)
+                    if (!state.isLoading && state.products.isEmpty()) {
+                        binding.rvFavorites.visibility = View.GONE
+                        binding.layoutEmpty.visibility = View.VISIBLE
+                    } else {
+                        binding.rvFavorites.visibility = View.VISIBLE
+                        binding.layoutEmpty.visibility = View.GONE
+                    }
+                }
             }
-        }
-
-        viewModel.favoriteIds.observe(viewLifecycleOwner) { ids ->
-            adapter.updateFavorites(ids)
         }
     }
 
