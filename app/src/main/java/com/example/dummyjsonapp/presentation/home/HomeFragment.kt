@@ -42,24 +42,27 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val categoryAdapter = CategoryAdapter(emptyList()) { clickedCategory ->
-            binding.recyclerView.scrollToPosition(0)
             viewModel.filterByCategory(clickedCategory.slug)
         }
         binding.rvCategories.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         binding.rvCategories.adapter = categoryAdapter
 
-        binding.edtSearch.addTextChangedListener {
+        binding.edtSearch.addTextChangedListener { text ->
+            // Chỉ thực hiện khi người dùng ĐANG focus vào ô tìm kiếm và thực sự gõ phím.
+            // Bỏ qua các sự kiện tự động khi Android phục hồi lại trạng thái view (State Restoration)
+            if (!binding.edtSearch.hasFocus()) return@addTextChangedListener
+
             searchJob?.cancel()
             searchJob = lifecycleScope.launch {
                 delay(500)
-                val keyword = binding.edtSearch.text.toString().trim()
+                val keyword = text.toString().trim()
                 if (keyword.isNotEmpty()) {
                     viewModel.searchProducts(keyword)
                 } else {
                     viewModel.loadData()
                 }
-                binding.recyclerView.scrollToPosition(0)
+                // Xóa lệnh scrollToPosition(0) ở đây vì ViewModel (emptyList) đã tự lo việc reset vị trí
             }
         }
 
@@ -96,11 +99,7 @@ class HomeFragment : Fragment() {
 
                     binding.progressBar.visibility = if (state.isLoading) View.VISIBLE else View.GONE
 
-                    adapter.submitList(state.products) {
-                        if (state.products.isNotEmpty()) {
-                            binding.recyclerView.scrollToPosition(0)
-                        }
-                    }
+                    adapter.submitList(state.products)
 
                     if (!state.isLoading && state.products.isEmpty()) {
                         binding.recyclerView.visibility = View.GONE

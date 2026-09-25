@@ -10,6 +10,7 @@ import com.example.dummyjsonapp.presentation.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,50 +29,74 @@ class HomeViewModel @Inject constructor (
     private var rawProducts : List<ProductModel> = emptyList()
     private var productJob: Job? = null
 
+    // Theo dõi ngữ cảnh danh mục/tìm kiếm hiện tại
+    private var currentContextSlug: String = "ALL"
+
     init {
         loadData()
         loadCategories()
         loadFavoriteIds()
     }
+
     private fun updateProductsFavorite() {
         val currentFavorites = _uiState.value.favoriteIds
-
         val newProductsFav = rawProducts.map { product ->
             product.copy(isFavorite = currentFavorites.contains(product.id))
         }
-
         _uiState.update { it.copy(products = newProductsFav) }
     }
+
     fun loadData() {
+        if (currentContextSlug == "ALL" && rawProducts.isNotEmpty()) return
+        currentContextSlug = "ALL"
+        executeProductFlow { repository.getProducts() }
+    }
+
+    fun searchProducts(keyword: String) {
+        val slug = "SEARCH_$keyword"
+        if (currentContextSlug == slug) return
+        currentContextSlug = slug
+        executeProductFlow { repository.searchProducts(keyword) }
+    }
+
+    fun filterByCategory(slug: String) {
+        if (slug.isEmpty()) {
+            loadData()
+            return
+        }
+        val targetSlug = "CATEGORY_$slug"
+        if (currentContextSlug == targetSlug) return
+        currentContextSlug = targetSlug
+        executeProductFlow { repository.getProductsByCategory(slug) }
+    }
+
+    // Hàm dùng chung cho các tác vụ lấy danh sách sản phẩm
+    private fun executeProductFlow(flowProvider: suspend () -> Flow<Resource<List<ProductModel>>>) {
         productJob?.cancel()
+
+        // Xóa danh sách cũ NGAY LẬP TỨC để tránh UI bị rối hoặc List tự cuộn lung tung
+        rawProducts = emptyList()
+        _uiState.update { it.copy(products = emptyList(), isLoading = true) }
+
         productJob = viewModelScope.launch {
-            repository.getProducts().collect { resource ->
+            flowProvider().collect { resource ->
                 when (resource) {
-
                     Resource.Loading -> {
-                        _uiState.update {
-                            it.copy(isLoading = true)
-                        }
+                        _uiState.update { it.copy(isLoading = true) }
                     }
-
                     is Resource.Success -> {
                         _uiState.update { it.copy(isLoading = false, errorMessage = null) }
                         rawProducts = resource.data
                         updateProductsFavorite()
                     }
-
                     is Resource.Error -> {
-                        _uiState.update {
-                            it.copy(
-                                isLoading = false,
-                                errorMessage = resource.message
-                            )
-                        }
+                        _uiState.update { it.copy(isLoading = false, errorMessage = resource.message) }
                     }
                 }
             }
         }
     }
+
     fun loadCategories() {
         viewModelScope.launch {
             repository.getCategories().collect { resource->
@@ -87,60 +112,16 @@ class HomeViewModel @Inject constructor (
                     is Resource.Loading -> {}
                 }
             }
+        }
+    }
 
-
-        }
-    }
-    fun searchProducts(keyword: String) {
-        productJob?.cancel()
-        productJob = viewModelScope.launch {
-            repository.searchProducts(keyword).collect { resource ->
-                when(resource){
-                    is Resource.Success -> {
-                        _uiState.update { it.copy(isLoading = false)}
-                        rawProducts = resource.data
-                        updateProductsFavorite()
-                    }
-                    is Resource.Error -> {
-                        _uiState.update { it.copy(isLoading = false, errorMessage = resource.message) }
-                    }
-                    is Resource.Loading -> {
-                        _uiState.update { it.copy(isLoading = true) }
-                    }
-                }
-            }
-        }
-    }
-    fun filterByCategory(slug: String) {
-        productJob?.cancel()
-        if (slug.isEmpty()) {
-            loadData()
-            return
-        }
-        productJob = viewModelScope.launch {
-            repository.getProductsByCategory(slug).collect { resource ->
-                when(resource){
-                    is Resource.Success -> {
-                        _uiState.update { it.copy(isLoading = false) }
-                        rawProducts = resource.data
-                        updateProductsFavorite()
-                    }
-                    is Resource.Error -> {
-                        _uiState.update { it.copy(isLoading = false, errorMessage = resource.message) }
-                    }
-                    is Resource.Loading -> {
-                        _uiState.update { it.copy(isLoading = true) }
-                    }
-                }
-            }
-        }
-    }
     fun toggleFavorite(productId: Int, isFavorite: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.toggleFavorite(productId, isFavorite)
             loadFavoriteIds()
         }
     }
+
     fun loadFavoriteIds() {
         viewModelScope.launch(Dispatchers.IO) {
             val ids = repository.getAllFavoriteIds().toSet()
@@ -148,6 +129,7 @@ class HomeViewModel @Inject constructor (
             updateProductsFavorite()
         }
     }
+
     fun clearError() {
         _uiState.update { it.copy(errorMessage = null) }
     }
